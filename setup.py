@@ -20,7 +20,7 @@
 '''
 from setuptools import setup, find_packages
 
-name = 'pyomadb'
+name = 'omadb'
 with open('{:s}/__init__.py'.format(name), 'rt') as fp:
     for line in fp:
         if line.startswith('__version__'):

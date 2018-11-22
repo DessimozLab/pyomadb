@@ -169,7 +169,7 @@ class Client(object):
                          else endpoint)
         if cached:
             if cache_path is None:
-                self.CACHE_PATH = appdirs.user_cache_dir(__package__)
+                self.CACHE_PATH = appdirs.user_cache_dir('py' + __package__)
             else:
                 self.CACHE_PATH = os.path.abspath(cache_path)
             self._version_check()
