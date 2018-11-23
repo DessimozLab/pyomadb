@@ -19,6 +19,7 @@
     along with PyOMADB.  If not, see <http://www.gnu.org/licenses/>.
 '''
 from collections import defaultdict
+from functools import lru_cache
 from pprint import pformat
 from property_manager import lazy_property
 from requests_cache.core import CachedSession
@@ -161,17 +162,18 @@ class Client(object):
                'Accept': 'application/json'}
     TIMEOUT = 60
     PER_PAGE = 10000
+    RAMCACHE_SIZE = 10000
 
-    def __init__(self, endpoint='omabrowser.org/api', cached=False,
-                 cache_path=None):
+    def __init__(self, endpoint='omabrowser.org/api', persistent_cached=False,
+                 persistent_cache_path=None):
         self.endpoint = ('https://' + endpoint
                          if not endpoint.startswith('http')
                          else endpoint)
-        if cached:
-            if cache_path is None:
+        if persistent_cached:
+            if persistent_cache_path is None:
                 self.CACHE_PATH = appdirs.user_cache_dir('py' + __package__)
             else:
-                self.CACHE_PATH = os.path.abspath(cache_path)
+                self.CACHE_PATH = os.path.abspath(persistent_cache_path)
             self._version_check()
             self._setup_cache()
         self._setup()
@@ -270,6 +272,20 @@ class Client(object):
             raise ValueError('Data is not defined.')
         return json.dumps(data)
 
+    @lru_cache(RAMCACHE_SIZE)
+    def _request_get(self, url, **params):
+        get = getattr(self, 'session', requests).get
+        return get(url,
+                   headers=self.HEADERS,
+                   params=params,
+                   timeout=self.TIMEOUT)
+
+    def _request_post(self, url, data):
+        return requests.post(url,
+                             data=data,
+                             headers=self.HEADERS,
+                             timeout=self.TIMEOUT)
+
     def request(self, request_type='get', **kwargs):
         raw = kwargs.pop('raw', False)
         progress_desc = kwargs.pop('progress_desc', '')
@@ -280,16 +296,10 @@ class Client(object):
                else uri)
         try:
             if request_type is 'get':
-                get = getattr(self, 'session', requests).get
-                r = get(url,
-                        headers=self.HEADERS,
-                        params=params,
-                        timeout=self.TIMEOUT)
+                r = self._request_get(url, **params)
             elif request_type is 'post':
-                r = requests.post(url,
-                                  data=self._get_request_data(**kwargs),
-                                  headers=self.HEADERS,
-                                  timeout=self.TIMEOUT)
+                data = self._get_request_data(**kwargs)
+                r = self._request_post(url, data)
             else:
                 raise ValueError('Unsure how to deal with request type'
                                  '{}'.format(request_type))
