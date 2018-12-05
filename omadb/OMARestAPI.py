@@ -493,7 +493,8 @@ class OMAGroups(ClientFunctionSet):
 
     @lazy_property
     def groups(self):
-        # TODO: work out how to iter as well as store? 
+        # TODO: work out how to iter as well as store?
+        # Could this be an async dict?
         return {r['oma_group']: r['group_url']
                 for r in self._client.request(action='group')}
 
@@ -507,15 +508,18 @@ class OMAGroups(ClientFunctionSet):
 
 class Taxonomy(ClientFunctionSet):
     def __call__(self, *args, **kwargs):
-        return self.get(*args, **kwargs)
+        return self.tree(*args, **kwargs)
 
     def get(self, members=None):
         return self._client.request(action='taxonomy',
                                     params=({'members': ','.join(members)}
                                             if members is not None else None))
 
-    def tree(self, *args, **kwargs):
-        def get_names(tree):
+    def read(self, root):
+        return self._client.request(action=['taxonomy', root])
+
+    def tree(self, members=None, root=None, with_names=None):
+        def get_names(tree, with_names):
             internal_names = [tree.name]
             leaf_names = []
             nodes = tree.children
@@ -525,22 +529,28 @@ class Taxonomy(ClientFunctionSet):
                     if hasattr(n, 'children'):
                         nodes1 += n.children
                         internal_names.append(n.name)
+                    elif with_names:
+                        leaf_names.append(n.name)
                     else:
-                        leaf_names.append(n.id)
+                        leaf_names.append(n.code)
                 nodes = nodes1
-            return (internal_names, leaf_names)
+            return (internal_names + leaf_names)
 
-        mapping = dict(map(lambda x: (x[1].taxon_id, x[0]),
-                           self._client.genomes))
-        struct = self.get(*args, **kwargs)
-        (internal_names, leaf_names) = get_names(struct)
-        names = internal_names + list(map(mapping.get, leaf_names))
+        if ((members is not None) and (root is not None)):
+            raise ValueError('Taxonomy undefined in API when members and '
+                             'root are both set.')
+        elif members is not None:
+            struct = self.get(members=members)
+        elif root is not None:
+            struct = self.read(root)
+        else:
+            struct = self.get()
 
-        taxon_namespace = dendropy.TaxonNamespace(names)
+        taxon_namespace = dendropy.TaxonNamespace(get_names(struct,
+                                                            with_names))
         tree = dendropy.Tree(taxon_namespace=taxon_namespace)
 
-        ch = tree.seed_node.new_child(edge_length=1)
-        ch.taxon = taxon_namespace.get_taxon(struct.name)
+        tree.seed_node.taxon = taxon_namespace.get_taxon(struct.name)
         nodes = [(tree.seed_node, c) for c in struct.children]
         while len(nodes) > 0:
             nodes1 = []
@@ -549,8 +559,10 @@ class Taxonomy(ClientFunctionSet):
                 if hasattr(child, 'children'):
                     ch.taxon = taxon_namespace.get_taxon(child.name)
                     nodes1 += [(ch, c) for c in child.children]
+                elif with_names:
+                    ch.taxon = taxon_namespace.get_taxon(child.name)
                 else:
-                    ch.taxon = taxon_namespace.get_taxon(mapping[child.id])
+                    ch.taxon = taxon_namespace.get_taxon(child.code)
             nodes = nodes1
 
         return tree
