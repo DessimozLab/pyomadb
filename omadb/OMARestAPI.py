@@ -580,9 +580,12 @@ class PairwiseRelations(ClientFunctionSet):
     def __call__(self, *args, **kwargs):
         return self.read(*args, **kwargs)
 
-    def read(self, genome_id1, genome_id2, chr1=None, chr2=None, rel_type=None):
+    def read(self, genome_id1, genome_id2, chr1=None, chr2=None, rel_type=None,
+             progress=False):
         return self._client.request(action=['pairs', genome_id2],
                                     subject=genome_id1,
                                     chr1=chr1,
                                     chr2=chr2,
-                                    rel_type=rel_type)
+                                    rel_type=rel_type,
+                                    progress_desc=('Loading pairs'
+                                                  if progress else None))
