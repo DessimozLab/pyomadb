@@ -587,5 +587,6 @@ class PairwiseRelations(ClientFunctionSet):
                                     chr1=chr1,
                                     chr2=chr2,
                                     rel_type=rel_type,
+                                    paginated=True,
                                     progress_desc=('Loading pairs'
                                                   if progress else None))
