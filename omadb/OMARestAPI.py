@@ -169,6 +169,8 @@ class Client(object):
         self.endpoint = ('https://' + endpoint
                          if not endpoint.startswith('http')
                          else endpoint)
+        from . import __version__ as client_version
+        self.HEADERS['User-agent'] = 'pyomadb/'+client_version
         if persistent_cached:
             if persistent_cache_path is None:
                 self.CACHE_PATH = appdirs.user_cache_dir('py' + __package__)
