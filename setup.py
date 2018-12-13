@@ -40,5 +40,7 @@ setup(
     description=desc,
     packages=find_packages(),
     install_requires=requirements,
+    extras_require={'Taxonomy in Dendropy Tree': ['dendropy'],
+                    'Taxonomy in ETE Tree': ['ete3']},
     python_requires=">=3.6",
     license='LGPLv3')
