@@ -122,6 +122,8 @@ ClientPagedResponse
 +++++++++++++++++++
 .. autoclass:: omadb.OMARestAPI.ClientPagedResponse
 
+  .. automethod:: __iter__
+
 
 License
 +++++++
