@@ -29,6 +29,7 @@ import appdirs
 import json
 import numbers
 import os
+import pandas as pd
 import requests
 import shutil
 import warnings
@@ -47,10 +48,10 @@ class AttrDict(object):
 
     def _setup(self):
         for (k, v) in self.__dictionary__.items():
-            if type(v) == dict:
+            if isinstance(v, dict):
                 self.__dictionary__[k] = self._recurse_create(v)
-            elif type(v) == list:
-                self.__dictionary__[k] = [(x if type(x) != dict else
+            elif isinstance(v, list):
+                self.__dictionary__[k] = [(x if not isinstance(x, dict) else
                                            self._recurse_create(x))
                                           for x in v]
             if hasattr(self, '_setup_extra'):
@@ -83,6 +84,17 @@ class AttrDict(object):
     def __str__(self):
         return repr(self.__dictionary__)
 
+    def _undo_attrdict(self):
+        # This is for strange scenarios where there isn't too much data,
+        # as it creates a copy.
+        y = {}
+        for (k, v) in self.items():
+            if isinstance(v, AttrDict):
+                y[k] = v._undo_attrdict()
+            else:
+                y[k] = v
+        return y
+
 
 class ClientResponse(AttrDict):
     def __init__(self, response, client=None, _is_paginated=None):
@@ -94,11 +106,30 @@ class ClientResponse(AttrDict):
 
     def __getattr__(self, attr):
         r = super().__getattr__(attr)
-        return r if (type(r) is not ClientRequest) else r()
+        return r if not isinstance(r, ClientRequest) else r()
 
     def _setup_extra(self, k, v):
-        if type(v) == str and v.startswith(self.client.endpoint):
+        if isinstance(v, str) and v.startswith(self.client.endpoint):
             self.__dictionary__[k] = ClientRequest(self.client, v)
+
+    def as_dataframe(self, k):
+        '''
+        Get a dataframe for the list stored in a particular key / attribute.
+
+        Note: any nested attribute-dictionaries shall have to be converted to
+        dictionaries for compatibility reasons with pandas.
+
+        :return: data frame for list of entries
+        :rtype: pd.DataFrame
+        '''
+        if not isinstance(self[k], list):
+            raise TypeError('{} is not a list, cannot convert to '
+                            'dataframe.'.format(k))
+        if not isinstance(self[k][0], ClientResponse):
+            raise TypeError('{} is not a list of dictionary-like elements, '
+                            'cannot convert to dataframe.'.format(k))
+        return pd.DataFrame.from_records(map(lambda x: x._undo_attrdict(),
+                                             self[k]))
 
 
 class ClientPagedResponse(object):
@@ -106,6 +137,11 @@ class ClientPagedResponse(object):
         self.client = client
         self.response = response
         self.progress_desc = ('' if progress_desc is None else progress_desc)
+
+    def _yield_elts(self, f, x, pbar):
+        for e in map(f, x):
+            yield e
+            pbar.update()
 
     def __iter__(self):
         '''
@@ -120,16 +156,53 @@ class ClientPagedResponse(object):
                     total=int(r.headers.get('X-Total-Count', len(x))),
                     disable=(len(self.progress_desc) == 0))
 
-        for e in map(lambda e: ClientResponse(e, client=self.client), x):
-            yield e
-            pbar.update()
+        yield from self._yield_elts(lambda e: ClientResponse(e,
+                                                             client=self.client), 
+                                    x, pbar)
 
         while 'next' in r.links:
             r = self.client._request(uri=r.links['next']['url'], raw=True)
-            for e in map(lambda e: ClientResponse(e, client=self.client),
-                         json.loads(r.content)):
-                yield e
-                pbar.update()
+            yield from self._yield_elts(lambda e: ClientResponse(e,
+                                                                 client=self.client), 
+                                        json.loads(r.content), pbar)
+        pbar.close()
+
+    def as_dataframe(self):
+        '''
+        Retrieves all entries, from all pages. Returns as pandas data frame.
+
+        Note: in general, it would be better to use iter_dataframes to deal
+        with the returned entries in chunks (if possible).
+
+        :return: data frame containing all entries in response
+        :rtype: pd.DataFrame
+        '''
+        return pd.concat(self.iter_dataframes())
+
+    def iter_dataframes(self):
+        '''
+        Yields dataframes for each page of response. That is, entries are
+        yielded in chunks.
+        '''
+        r = self.response
+        x = json.loads(r.content)
+
+        pbar = tqdm(desc=self.progress_desc,
+                    unit=' entries',
+                    total=int(r.headers.get('X-Total-Count', len(x))),
+                    disable=(len(self.progress_desc) == 0))
+
+        yield pd.DataFrame.from_records(
+            self._yield_elts(self.client._add_lazy_calls,
+                             x,
+                             pbar))
+
+        while 'next' in r.links:
+            r = self.client._request(uri=r.links['next']['url'], raw=True)
+            yield pd.DataFrame.from_records(
+                self._yield_elts(self.client._add_lazy_calls,
+                                 json.loads(r.content),
+                                 pbar))
         pbar.close()
 
 
@@ -142,7 +215,7 @@ class ClientRequest(object):
         return self.client._request(uri=self.uri)
 
     def __str__(self):
-        return self.uri
+        return repr(self)
 
     def __repr__(self):
         return '<API Request {}>'.format(self.uri[len(self.client.endpoint):])
@@ -270,10 +343,10 @@ class Client(object):
     def _get_request_uri(self, uri=None, action=None, subject=None,
                          params=None, **kwargs):
         if uri is None:
-            if action is None or (type(action) is list and len(action) == 0):
+            if action is None or (isinstance(action, list) and len(action) == 0):
                 raise Exception('No action declared.')
 
-            if type(action) is list:
+            if isinstance(action, list):
                 uri = '/{}'.format(action[0])
                 uri += '/{}'.format(subject) if subject is not None else ''
                 if len(action) > 1 and action[1] != 'list':
@@ -318,6 +391,7 @@ class Client(object):
     def _request(self, request_type='get', **kwargs):
         raw = kwargs.pop('raw', False)
         progress_desc = kwargs.pop('progress_desc', '')
+        as_dataframe = kwargs.pop('as_dataframe', False)
 
         # Get URI and params
         (uri, params) = self._get_request_uri(**kwargs)
@@ -354,10 +428,13 @@ class Client(object):
 
             else:
                 content = json.loads(r.content)
-                if type(content) is list:
-                    return list(map(lambda x: ClientResponse(x, client=self),
-                                    content))
-
+                if isinstance(content, list):
+                    if as_dataframe:
+                        return pd.DataFrame.from_records(
+                            map(self._add_lazy_calls, content))
+                    else:
+                        return list(map(lambda x: ClientResponse(x, client=self),
+                                        content))
                 else:
                     return ClientResponse(content, client=self)
         else:
@@ -370,6 +447,14 @@ class Client(object):
 
     def _is_paginated(self, r):
         return len(set(r.links.keys()) & {'next', 'last'}) == 2
+
+    def _add_lazy_calls(self, e):
+        for (k, v) in e.items():
+            if isinstance(v, str) and v.startswith(self.endpoint):
+                e[k] = ClientRequest(self, v)
+            elif isinstance(v, dict):
+                e[k] = self._add_lazy_calls(v)
+        return e
 
 
 
@@ -474,7 +559,7 @@ class HOGs(ClientFunctionSet):
         entry = c.hogs['WHEAT00001']
     '''
     def _ensure_hog_id(self, hog_id):
-        return 'HOG:{:07d}'.format(hog_id) if type(hog_id) is int else hog_id
+        return 'HOG:{:07d}'.format(hog_id) if isinstance(hog_id, numbers.Number) else hog_id
 
     def __getitem__(self, hog_id):
         '''
@@ -523,21 +608,25 @@ class HOGs(ClientFunctionSet):
         return self._client._request(action='hog',
                                      subject=self._ensure_hog_id(hog_id))[0]
 
-    def members(self, hog_id, level=None):
+    def members(self, hog_id, level=None, as_dataframe=None):
         '''
         Retrieve list of protein entries in a given HOG.
 
         :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
         :type hog_id: str or int
         :param str level: level of interest
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: list of members
         :rtype: list
         '''
-        return self._client._request(action=['hog', 'members'],
-                                     subject=self._ensure_hog_id(hog_id),
-                                     params={'level': level},
-                                     level=level).members
+        z = self._client._request(action=['hog', 'members'],
+                                  subject=self._ensure_hog_id(hog_id),
+                                  level=level)
+        if as_dataframe:
+            return z.as_dataframe('members')
+        else:
+            return z.members
 
     def external_references(self, hog_id, type=None):
         '''
@@ -622,18 +711,20 @@ class Entries(ClientFunctionSet):
         return self._client._request(action=['protein', 'domains'],
                                      subject=entry_id)
 
-    def gene_ontology(self, entry_id):
+    def gene_ontology(self, entry_id, as_dataframe=None):
         '''
         Retrieve any associations to Gene Ontology terms for a protein.
 
         :param entry_id: a unique identifier for a protein
         :type entry_id: str or int
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: gene ontology associations
-        :rtype: ClientResponse
+        :rtype: list
         '''
         return self._client._request(action=['protein', 'ontology'],
-                                     subject=entry_id)
+                                     subject=entry_id,
+                                     as_dataframe=as_dataframe)
 
     def homoeologs(self, entry_id):
         '''
@@ -828,19 +919,21 @@ class OMAGroups(ClientFunctionSet):
         '''
         return self._client._request(action='group', subject=group_id)
 
-    def close_groups(self, group_id):
+    def close_groups(self, group_id, as_dataframe=None):
         '''
         Retrieve the sorted list of closely related groups for a given OMA
         group.
 
         :param group_id: unique identifier of a group - either group number, fingerprint or entry ID of a member.
         :type group_id: int or str
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: sorted list of closely related groups
         :rtype: list
         '''
         return self._client._request(action=['group', 'close_groups'],
-                                     subject=group_id)
+                                     subject=group_id,
+                                     as_dataframe=as_dataframe)
 
 
 class Taxonomy(ClientFunctionSet):
@@ -1047,11 +1140,13 @@ class ExternalReferences(ClientFunctionSet):
         Retrieve external references for a particular sequence.
 
         :param str sequence: query sequence or pattern
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
-        :return: list of cross references
-        :rtype: list
+        :return: list of cross references and match information
+        :rtype: ClientResponse
         '''
-        return self._client._request(action='xref', params={'search': sequence})
+        return self._client._request(action='xref',
+                                     params={'search': sequence})
 
 
 class PairwiseRelations(ClientFunctionSet):
