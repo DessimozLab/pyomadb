@@ -1,0 +1,1303 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.4 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> PyOMADB
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.4
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PyOMADB</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>omadb.OMARestAPI</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for omadb.OMARestAPI</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    PyOMADB -- client to the OMA browser, using the REST API.</span>
+
+<span class="sd">    (C) 2018 Alex Warwick Vesztrocy &lt;alex@warwickvesztrocy.co.uk&gt;</span>
+
+<span class="sd">    This file is part of PyOMADB.</span>
+
+<span class="sd">    PyOMADB is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    PyOMADB is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU Lesser General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">    along with PyOMADB.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">property_manager</span> <span class="k">import</span> <span class="n">lazy_property</span>
+<span class="kn">from</span> <span class="nn">requests_cache.core</span> <span class="k">import</span> <span class="n">CachedSession</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">uri_quote</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">appdirs</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="AttrDict"><a class="viewcode-back" href="../../index.html#omadb.AttrDict">[docs]</a><span class="k">class</span> <span class="nc">AttrDict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">get</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">pop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recurse_create</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span> <span class="k">else</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">_recurse_create</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                                          <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_setup_extra&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup_extra</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+
+    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_recurse_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ClientResponse"><a class="viewcode-back" href="../../index.html#omadb.ClientResponse">[docs]</a><span class="k">class</span> <span class="nc">ClientResponse</span><span class="p">(</span><span class="n">AttrDict</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_is_paginated</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_recurse_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span> <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ClientRequest</span><span class="p">)</span> <span class="k">else</span> <span class="n">r</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_setup_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">endpoint</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientRequest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ClientPagedResponse"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse">[docs]</a><span class="k">class</span> <span class="nc">ClientPagedResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">progress_desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_desc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span><span class="p">,</span>
+                    <span class="n">unit</span><span class="o">=</span><span class="s1">&#39; entries&#39;</span><span class="p">,</span>
+                    <span class="n">total</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X-Total-Count&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span>
+                    <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span> <span class="n">x</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">e</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="s1">&#39;next&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">links</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span>
+                         <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)):</span>
+                <span class="k">yield</span> <span class="n">e</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<span class="k">class</span> <span class="nc">ClientRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;API Request </span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">endpoint</span><span class="p">):])</span>
+
+
+<span class="k">class</span> <span class="nc">ClientException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">ClientTimeout</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">NotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Client"><a class="viewcode-back" href="../../index.html#omadb.Client">[docs]</a><span class="k">class</span> <span class="nc">Client</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Client for the OMA browser REST API.</span>
+
+<span class="sd">    Initialisation example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+
+<span class="sd">    :raises ClientException: for 400, 404, 500 errors.</span>
+<span class="sd">    :raises ClientTimeout: for timeout when interacting with REST endpoint.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">HEADERS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Content-type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+    <span class="n">TIMEOUT</span> <span class="o">=</span> <span class="mi">60</span>
+    <span class="n">PER_PAGE</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="n">RAMCACHE_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<div class="viewcode-block" id="Client.__init__"><a class="viewcode-back" href="../../index.html#omadb.Client.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s1">&#39;omabrowser.org/api&#39;</span><span class="p">,</span> <span class="n">persistent_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">persistent_cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param str endpoint: OMA REST API endpoint (default omabrowser.org/api)</span>
+<span class="sd">        :param bool persistent_cached: whether to cache queries on disk in SQLite DB.</span>
+<span class="sd">        :param persistent_cache_path: location for persistent cache, optional</span>
+<span class="sd">        :type persistent_cache_path: str or None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://&#39;</span> <span class="o">+</span> <span class="n">endpoint</span>
+                         <span class="k">if</span> <span class="ow">not</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">)</span>
+                         <span class="k">else</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">client_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">[</span><span class="s1">&#39;User-agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pyomadb/&#39;</span><span class="o">+</span><span class="n">client_version</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">persistent_cached</span> <span class="o">=</span> <span class="n">persistent_cached</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_cached</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">persistent_cache_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span> <span class="o">=</span> <span class="n">appdirs</span><span class="o">.</span><span class="n">user_cache_dir</span><span class="p">(</span><span class="s1">&#39;py&#39;</span> <span class="o">+</span> <span class="n">__package__</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">persistent_cache_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_version_check</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_cache</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Client.clear_cache"><a class="viewcode-back" href="../../index.html#omadb.Client.clear_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Clear both RAM and persistent cache.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_get</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;session&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent_cached</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_version_check</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup_cache</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_setup_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">CachedSession</span><span class="p">(</span><span class="n">cache_name</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">,</span>
+                                                             <span class="s1">&#39;api-cache&#39;</span><span class="p">),</span>
+                                     <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;sqlite&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genomes</span> <span class="o">=</span> <span class="n">Genomes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span> <span class="o">=</span> <span class="n">Entries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hogs</span> <span class="o">=</span> <span class="n">HOGs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">OMAGroups</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">taxonomy</span> <span class="o">=</span> <span class="n">Taxonomy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairwise</span> <span class="o">=</span> <span class="n">PairwiseRelations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xrefs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_references</span> <span class="o">=</span> <span class="n">ExternalReferences</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+
+    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">oma_release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">[</span><span class="s1">&#39;oma_version&#39;</span><span class="p">]</span>
+
+    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">api_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">[</span><span class="s1">&#39;api_version&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_version_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">db_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="s1">&#39;oma-version&#39;</span><span class="p">)</span>
+        <span class="n">api_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="s1">&#39;api-version&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">db_fn</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">oma_release</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">api_fn</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">api_version</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">oma_release</span> <span class="o">!=</span> <span class="n">oma_release</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_version</span> <span class="o">!=</span> <span class="n">api_version</span><span class="p">)):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;OMA database and / or API updated. &#39;</span>
+                              <span class="s1">&#39;Clearing cache.&#39;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">db_fn</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">db_fn</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oma_release</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">api_fn</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">api_fn</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_version</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_request_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                         <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">uri</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;No action declared.&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span> <span class="k">if</span> <span class="n">subject</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">action</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+                    <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+                <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span> <span class="k">if</span> <span class="n">subject</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">uri_quote</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">uri</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;?&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">)</span> <span class="k">else</span> <span class="n">uri</span>
+
+        <span class="c1"># Parse params</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">params</span>
+        <span class="n">paginated</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;paginated&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">paginated</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;per_page&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PER_PAGE</span>
+
+        <span class="c1"># Add the rest of kwargs to params</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uri</span><span class="p">),</span> <span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data is not defined.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">RAMCACHE_SIZE</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_request_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">get</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;session&#39;</span><span class="p">,</span> <span class="n">requests</span><span class="p">)</span><span class="o">.</span><span class="n">get</span>
+        <span class="k">return</span> <span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span>
+                   <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span>
+                   <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                   <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_request_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span>
+                             <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                             <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span>
+                             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">progress_desc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;progress_desc&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Get URI and params</span>
+        <span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request_uri</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">+</span> <span class="n">uri</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+               <span class="k">else</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">request_type</span> <span class="ow">is</span> <span class="s1">&#39;get&#39;</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">request_type</span> <span class="ow">is</span> <span class="s1">&#39;post&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsure how to deal with request type&#39;</span>
+                                 <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">request_type</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClientTimeout</span><span class="p">(</span><span class="s1">&#39;API timed out after&#39;</span>
+                                <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">))</span>
+
+        <span class="c1"># Check if response OK</span>
+        <span class="n">response_status</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">response_status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;for url:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">response_status</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">r</span>
+
+            <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;paginated&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paginated</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ClientPagedResponse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                           <span class="n">r</span><span class="p">,</span>
+                                           <span class="n">progress_desc</span><span class="o">=</span><span class="n">progress_desc</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">),</span>
+                                    <span class="n">content</span><span class="p">))</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">400</span><span class="p">,</span> <span class="mi">404</span><span class="p">}:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;detail&#39;</span><span class="p">}:</span>
+                    <span class="n">response_status</span> <span class="o">+=</span> <span class="s1">&#39;[&quot;&#39;</span> <span class="o">+</span> <span class="n">z</span><span class="o">.</span><span class="n">detail</span> <span class="o">+</span> <span class="s1">&#39;&quot;]&#39;</span>
+            <span class="k">raise</span> <span class="n">ClientException</span><span class="p">(</span><span class="n">response_status</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_paginated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&amp;</span> <span class="p">{</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="s1">&#39;last&#39;</span><span class="p">})</span> <span class="o">==</span> <span class="mi">2</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">ClientFunctionSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_setup&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Genomes"><a class="viewcode-back" href="../../index.html#omadb.Genomes">[docs]</a><span class="k">class</span> <span class="nc">Genomes</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for genome information.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        wheat = c.genomes.genome(&#39;WHEAT&#39;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Genomes.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information on a genome in OMA.</span>
+
+<span class="sd">        :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code</span>
+<span class="sd">        :type genome_id: str or int</span>
+
+<span class="sd">        :return: genome information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="n">genome_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genomes.__iter__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterate over all genomes.&#39;&#39;&#39;</span> 
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Synonym for `genomes`. Retrieve information on all genomes in OMA.</span>
+
+<span class="sd">        :return: information on all genomes</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genomes</span>
+
+<div class="viewcode-block" id="Genomes.genomes"><a class="viewcode-back" href="../../index.html#omadb.Genomes.genomes">[docs]</a>    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">genomes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information on all genomes in OMA.</span>
+
+<span class="sd">        :return: information on all genomes</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">{</span><span class="n">sp</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">):</span> <span class="n">sp</span>
+             <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span>
+                                             <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genomes.genome"><a class="viewcode-back" href="../../index.html#omadb.Genomes.genome">[docs]</a>    <span class="k">def</span> <span class="nf">genome</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information on a genome in OMA.</span>
+
+<span class="sd">        :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code</span>
+<span class="sd">        :type genome_id: str or int</span>
+
+<span class="sd">        :return: genome information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">genome_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genomes.proteins"><a class="viewcode-back" href="../../index.html#omadb.Genomes.proteins">[docs]</a>    <span class="k">def</span> <span class="nf">proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrive all proteins for a particular genome.</span>
+
+<span class="sd">        :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code</span>
+<span class="sd">        :type genome_id: str or int</span>
+<span class="sd">        :param bool progress: whether to show progress bar</span>
+
+<span class="sd">        :return: proteins in genome</span>
+<span class="sd">        :rtype: ClientPagedResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Retrieving proteins for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sp_code</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span> <span class="s1">&#39;proteins&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">genome_id</span><span class="p">,</span>
+                                     <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">progress_desc</span><span class="o">=</span><span class="n">desc</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="HOGs"><a class="viewcode-back" href="../../index.html#omadb.HOGs">[docs]</a><span class="k">class</span> <span class="nc">HOGs</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for HOG information.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        entry = c.hogs[&#39;WHEAT00001&#39;]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">_ensure_hog_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;HOG:</span><span class="si">{:07d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="n">hog_id</span>
+
+<div class="viewcode-block" id="HOGs.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.HOGs.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the detail available for a given HOG.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+
+<span class="sd">        :return: HOG information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.list"><a class="viewcode-back" href="../../index.html#omadb.HOGs.list">[docs]</a>    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information about all HOGs.</span>
+
+<span class="sd">        :return: all HOGs</span>
+<span class="sd">        :rtype: ClientPagedResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_level</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.at_level"><a class="viewcode-back" href="../../index.html#omadb.HOGs.at_level">[docs]</a>    <span class="k">def</span> <span class="nf">at_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of HOGs at a particular level</span>
+
+<span class="sd">        :param str level: level of interest</span>
+<span class="sd">       </span>
+<span class="sd">        :return: all hogs at a particular level</span>
+<span class="sd">        :rtype: ClientPagedResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span> 
+                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">level</span><span class="p">},</span>
+                                     <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.info"><a class="viewcode-back" href="../../index.html#omadb.HOGs.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the detail available for a given HOG.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+
+<span class="sd">        :return: HOG information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensure_hog_id</span><span class="p">(</span><span class="n">hog_id</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="HOGs.members"><a class="viewcode-back" href="../../index.html#omadb.HOGs.members">[docs]</a>    <span class="k">def</span> <span class="nf">members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of protein entries in a given HOG.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+<span class="sd">        :param str level: level of interest</span>
+
+<span class="sd">        :return: list of members</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensure_hog_id</span><span class="p">(</span><span class="n">hog_id</span><span class="p">),</span>
+                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">level</span><span class="p">},</span>
+                                     <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span><span class="o">.</span><span class="n">members</span></div>
+
+<div class="viewcode-block" id="HOGs.external_references"><a class="viewcode-back" href="../../index.html#omadb.HOGs.external_references">[docs]</a>    <span class="k">def</span> <span class="nf">external_references</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve external references for all members of a particular HOG.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+<span class="sd">        :param str level: level of interest</span>
+
+<span class="sd">        :return: external references</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.xrefs"><a class="viewcode-back" href="../../index.html#omadb.HOGs.xrefs">[docs]</a>    <span class="k">def</span> <span class="nf">xrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve external references for all members of a particular HOG.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+<span class="sd">        :param str level: level of interest</span>
+
+<span class="sd">        :return: external references</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;omaid&#39;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;entry_nr&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)}</span></div></div>
+
+
+<div class="viewcode-block" id="Entries"><a class="viewcode-back" href="../../index.html#omadb.Entries">[docs]</a><span class="k">class</span> <span class="nc">Entries</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for protein entries.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        entry = c.entries[&#39;WHEAT00001&#39;]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Entries.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Entries.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the information available for a protein entry.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: entry information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.info"><a class="viewcode-back" href="../../index.html#omadb.Entries.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the information available for a protein entry.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: entry information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+                                         <span class="n">subject</span><span class="o">=</span><span class="s1">&#39;bulk_retrieve&#39;</span><span class="p">,</span>
+                                         <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ids&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)},</span>
+                                         <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.domains"><a class="viewcode-back" href="../../index.html#omadb.Entries.domains">[docs]</a>    <span class="k">def</span> <span class="nf">domains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the domains present in a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: domain information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;domains&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve any associations to Gene Ontology terms for a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: gene ontology associations</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.homoeologs"><a class="viewcode-back" href="../../index.html#omadb.Entries.homoeologs">[docs]</a>    <span class="k">def</span> <span class="nf">homoeologs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve all homoeologs for a given protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: list of homoeologs</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">homoeologues</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.homoeologues"><a class="viewcode-back" href="../../index.html#omadb.Entries.homoeologues">[docs]</a>    <span class="k">def</span> <span class="nf">homoeologues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve all homoeologues for a given protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: list of homoeologues</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;homoeologs&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.orthologs"><a class="viewcode-back" href="../../index.html#omadb.Entries.orthologs">[docs]</a>    <span class="k">def</span> <span class="nf">orthologs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">rel_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of all identified orthologs of a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+<span class="sd">        :param rel_type: relationship type to filter to (&#39;1:1&#39;, &#39;1:many&#39;, &#39;many:1&#39;, or &#39;many:many&#39;)</span>
+<span class="sd">        :type rel_type: str or None</span>
+
+<span class="sd">        :return: list of orthologs</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">orthologues</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="n">rel_type</span><span class="o">=</span><span class="n">rel_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.orthologues"><a class="viewcode-back" href="../../index.html#omadb.Entries.orthologues">[docs]</a>    <span class="k">def</span> <span class="nf">orthologues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">rel_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of all identified orthologues of a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+<span class="sd">        :param rel_type: relationship type (&#39;1:1&#39;, &#39;1:many&#39;, &#39;many:1&#39;, or &#39;many:many&#39;), optional</span>
+<span class="sd">        :type rel_type: str or None</span>
+
+<span class="sd">        :return: list of orthologues</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;orthologs&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+                                     <span class="n">params</span><span class="o">=</span><span class="p">({</span><span class="s1">&#39;rel_type&#39;</span><span class="p">:</span> <span class="n">rel_type</span><span class="p">}</span>
+                                             <span class="k">if</span> <span class="n">rel_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Entries.cross_references"><a class="viewcode-back" href="../../index.html#omadb.Entries.cross_references">[docs]</a>    <span class="k">def</span> <span class="nf">cross_references</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve all cross-references for a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+<span class="sd">        :param type: specify type of cross-references to retain</span>
+<span class="sd">        :type type: str or None</span>
+
+<span class="sd">        :return: cross references</span>
+<span class="sd">        :rtype: dict or set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.xrefs"><a class="viewcode-back" href="../../index.html#omadb.Entries.xrefs">[docs]</a>    <span class="k">def</span> <span class="nf">xrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve all cross-references for a protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+<span class="sd">        :param type: specify type of cross-references to retain</span>
+<span class="sd">        :type type: str or None</span>
+
+<span class="sd">        :return: cross references</span>
+<span class="sd">        :rtype: dict or set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">def</span> <span class="nf">reformat</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                <span class="n">z</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;xref&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">z</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;xref&#39;</span><span class="p">],</span>
+                                  <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;xref&#39;</span><span class="p">],</span>
+                           <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">type</span><span class="p">,</span> <span class="n">r</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reformat</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.search"><a class="viewcode-back" href="../../index.html#omadb.Entries.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">search</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">full_length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Search for closest sequence in OMA database.</span>
+
+<span class="sd">        :param str query: query sequence</span>
+<span class="sd">        :param search: search strategy (&#39;exact, &#39;approximate&#39;, &#39;mixed&#39; [Default])</span>
+<span class="sd">        :type search: str or None</span>
+<span class="sd">        :param bool full_length: indicates if exact matches have to be full length (by default, not)</span>
+
+<span class="sd">        :return: closest entries</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">,</span>
+                  <span class="s1">&#39;full_length&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">full_length</span><span class="p">)}</span>
+
+        <span class="n">search_valid</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;exact&#39;</span><span class="p">,</span> <span class="s1">&#39;approximate&#39;</span><span class="p">,</span> <span class="s1">&#39;mixed&#39;</span><span class="p">}</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">search</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">search</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">search_valid</span> <span class="ow">and</span> <span class="n">search</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> is not a valid search method. Choose from </span><span class="si">{}</span><span class="s1">&#39;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">search</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">search_valid</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="n">search</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s1">&#39;search&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">search</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;sequence&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Function"><a class="viewcode-back" href="../../index.html#omadb.Function">[docs]</a><span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for retrieving functional annotations for sequences.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        gos = c.function(&#39;ATCATATCAT&#39;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../index.html#omadb.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Annotate a sequence with GO terms based on annotations stored in the</span>
+<span class="sd">        OMA database.</span>
+
+<span class="sd">        :param str query: query sequence</span>
+
+<span class="sd">        :return: results of fast function prediction</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">,</span>
+                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="n">seq</span><span class="p">})</span></div></div>
+
+
+<div class="viewcode-block" id="OMAGroups"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups">[docs]</a><span class="k">class</span> <span class="nc">OMAGroups</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for retrieving information on OMA groups.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        og = c.groups[&#39;WHEAT00001&#39;]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="OMAGroups.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information available for a given OMA group.</span>
+
+<span class="sd">        :param group_id: unique identifier of a group - either group number, fingerprint or entry ID of a member.</span>
+<span class="sd">        :type group_id: int or str</span>
+
+<span class="sd">        :return: group information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OMAGroups.__iter__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Iterate over all OMA groups in the current release.</span>
+
+<span class="sd">        :yields: groups</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span>
+                                         <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OMAGroups.info"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information available for a given OMA group.</span>
+
+<span class="sd">        :param group_id: unique identifier of a group - either group number, fingerprint or entry ID of a member.</span>
+<span class="sd">        :type group_id: int or str</span>
+
+<span class="sd">        :return: group information</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OMAGroups.close_groups"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.close_groups">[docs]</a>    <span class="k">def</span> <span class="nf">close_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the sorted list of closely related groups for a given OMA</span>
+<span class="sd">        group.</span>
+
+<span class="sd">        :param group_id: unique identifier of a group - either group number, fingerprint or entry ID of a member.</span>
+<span class="sd">        :type group_id: int or str</span>
+
+<span class="sd">        :return: sorted list of closely related groups</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;close_groups&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">group_id</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Taxonomy"><a class="viewcode-back" href="../../index.html#omadb.Taxonomy">[docs]</a><span class="k">class</span> <span class="nc">Taxonomy</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+<div class="viewcode-block" id="Taxonomy.get"><a class="viewcode-back" href="../../index.html#omadb.Taxonomy.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">members</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve taxonomy in a particular format and return as string.</span>
+
+<span class="sd">        :param list members: list of members to get the induced taxonomy for, optional</span>
+<span class="sd">        :param str format: format of the taxonomy (dictionary [default], newick or phyloxml)</span>
+<span class="sd">        :param bool collapse: whether or not to collapse levels with single child, optional (default yes)</span>
+
+<span class="sd">        :return: taxonomy</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">members</span><span class="p">)</span> <span class="k">if</span> <span class="n">members</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span>
+                                  <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="n">members</span><span class="p">,</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">format</span><span class="p">,</span>
+                                          <span class="s1">&#39;collapse&#39;</span><span class="p">:</span> <span class="n">collapse</span><span class="p">},</span>
+                                 <span class="n">raw</span><span class="o">=</span><span class="p">((</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                                      <span class="p">(</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;newick&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s1">&#39;newick&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;phyloxml&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># This shouldn&#39;t really happen (Dec 2018)</span>
+            <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="Taxonomy.read"><a class="viewcode-back" href="../../index.html#omadb.Taxonomy.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collapse</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve taxonomy in a particular format and return as string.</span>
+
+<span class="sd">        :param root: taxon ID, species name or UniProt species code for root taxonomic level, optional</span>
+<span class="sd">        :type root: str or int</span>
+<span class="sd">        :param str format: format of the taxonomy (dictionary [default], newick or phyloxml)</span>
+<span class="sd">        :param bool collapse: whether or not to collapse levels with single child, optional (default yes)</span>
+
+<span class="sd">        :return: taxonomy </span>
+<span class="sd">        :rtype: str</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">],</span>
+                                  <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">format</span><span class="p">,</span>
+                                          <span class="s1">&#39;collapse&#39;</span><span class="p">:</span> <span class="n">collapse</span><span class="p">},</span>
+                                  <span class="n">raw</span><span class="o">=</span><span class="p">((</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> 
+                                       <span class="p">(</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;newick&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">content</span><span class="p">)[</span><span class="s1">&#39;newick&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;phyloxml&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># This shouldn&#39;t really happen (Dec 2018)</span>
+            <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="Taxonomy.dendropy_tree"><a class="viewcode-back" href="../../index.html#omadb.Taxonomy.dendropy_tree">[docs]</a>    <span class="k">def</span> <span class="nf">dendropy_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">members</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve taxonomy and load as dendropy tree.</span>
+
+<span class="sd">        :param list members: list of members to get the induced taxonomy for, optional</span>
+<span class="sd">        :param root: taxon ID, species name or UniProt species code for root taxonomic level, optional</span>
+<span class="sd">        :type root: str or int or None</span>
+<span class="sd">        :param bool with_names: whether to use species code (False, default) or species names (True), optional</span>
+
+<span class="sd">        :return: taxonomy loaded as dendropy tree object</span>
+<span class="sd">        :rtype: dendropy.Tree</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">dendropy</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Optional dependency of dendropy not installed.&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_names</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">with_names</span><span class="p">):</span>
+            <span class="n">internal_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">leaf_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">children</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">nodes1</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">):</span>
+                        <span class="n">nodes1</span> <span class="o">+=</span> <span class="n">n</span><span class="o">.</span><span class="n">children</span>
+                        <span class="n">internal_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">with_names</span><span class="p">:</span>
+                        <span class="n">leaf_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">leaf_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes1</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">internal_names</span> <span class="o">+</span> <span class="n">leaf_names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">members</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Taxonomy undefined in API when members and &#39;</span>
+                             <span class="s1">&#39;root are both set.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">members</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">members</span><span class="o">=</span><span class="n">members</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="n">taxon_namespace</span> <span class="o">=</span> <span class="n">dendropy</span><span class="o">.</span><span class="n">TaxonNamespace</span><span class="p">(</span><span class="n">get_names</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span>
+                                                            <span class="n">with_names</span><span class="p">))</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">dendropy</span><span class="o">.</span><span class="n">Tree</span><span class="p">(</span><span class="n">taxon_namespace</span><span class="o">=</span><span class="n">taxon_namespace</span><span class="p">)</span>
+
+        <span class="n">tree</span><span class="o">.</span><span class="n">seed_node</span><span class="o">.</span><span class="n">taxon</span> <span class="o">=</span> <span class="n">taxon_namespace</span><span class="o">.</span><span class="n">get_taxon</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">tree</span><span class="o">.</span><span class="n">seed_node</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nodes1</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">new_child</span><span class="p">(</span><span class="n">edge_length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">):</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">taxon</span> <span class="o">=</span> <span class="n">taxon_namespace</span><span class="o">.</span><span class="n">get_taxon</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">nodes1</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">ch</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">with_names</span><span class="p">:</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">taxon</span> <span class="o">=</span> <span class="n">taxon_namespace</span><span class="o">.</span><span class="n">get_taxon</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">taxon</span> <span class="o">=</span> <span class="n">taxon_namespace</span><span class="o">.</span><span class="n">get_taxon</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes1</span>
+
+        <span class="k">return</span> <span class="n">tree</span></div>
+
+<div class="viewcode-block" id="Taxonomy.ete_tree"><a class="viewcode-back" href="../../index.html#omadb.Taxonomy.ete_tree">[docs]</a>    <span class="k">def</span> <span class="nf">ete_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">members</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">with_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve taxonomy and load as ete3 tree.</span>
+
+<span class="sd">        :param list members: list of members to get the induced taxonomy for, optional</span>
+<span class="sd">        :param root: taxon ID, species name or UniProt species code for root taxonomic level, optional</span>
+<span class="sd">        :type root: str or int or None</span>
+<span class="sd">        :param bool with_names: whether to use species code (False, default) or species names (True), optional</span>
+
+<span class="sd">        :return: taxonomy loaded as ete tree object</span>
+<span class="sd">        :rtype: ete.Tree</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">ete3</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Optional dependency of ete3 not installed.&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_names</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">with_names</span><span class="p">):</span>
+            <span class="n">internal_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">tree</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">leaf_names</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">children</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">nodes1</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">):</span>
+                        <span class="n">nodes1</span> <span class="o">+=</span> <span class="n">n</span><span class="o">.</span><span class="n">children</span>
+                        <span class="n">internal_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">with_names</span><span class="p">:</span>
+                        <span class="n">leaf_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">leaf_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes1</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">internal_names</span> <span class="o">+</span> <span class="n">leaf_names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">members</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Taxonomy undefined in API when members and &#39;</span>
+                             <span class="s1">&#39;root are both set.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">members</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">members</span><span class="o">=</span><span class="n">members</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ete3</span><span class="o">.</span><span class="n">Tree</span><span class="p">()</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">tree</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">nodes1</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">child</span><span class="p">)</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">dist</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">):</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span>
+                    <span class="n">nodes1</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">ch</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">with_names</span><span class="p">:</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ch</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">code</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes1</span>
+
+        <span class="k">return</span> <span class="n">tree</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalReferences"><a class="viewcode-back" href="../../index.html#omadb.ExternalReferences">[docs]</a><span class="k">class</span> <span class="nc">ExternalReferences</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for external references from a query sequence.</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        xrefs = c.xrefs(&#39;AAA&#39;)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="ExternalReferences.__call__"><a class="viewcode-back" href="../../index.html#omadb.ExternalReferences.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve external references for a particular sequence.</span>
+
+<span class="sd">        :param str sequence: query sequence or pattern</span>
+
+<span class="sd">        :return: list of cross references</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;xref&#39;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">})</span></div></div>
+
+
+<div class="viewcode-block" id="PairwiseRelations"><a class="viewcode-back" href="../../index.html#omadb.PairwiseRelations">[docs]</a><span class="k">class</span> <span class="nc">PairwiseRelations</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    API functionality for pairwise relations..</span>
+
+<span class="sd">    Access indirectly, via the client.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        from omadb import Client</span>
+<span class="sd">        c = Client()</span>
+<span class="sd">        arath_wheat_pairs = list(c.pairwise(&#39;ARATH&#39;, &#39;WHEAT&#39;, progress=True))</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="PairwiseRelations.__call__"><a class="viewcode-back" href="../../index.html#omadb.PairwiseRelations.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id1</span><span class="p">,</span> <span class="n">genome_id2</span><span class="p">,</span> <span class="n">chr1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chr2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">rel_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        List the pairwise relations among two genomes. </span>
+
+<span class="sd">        If genome_id1 == genome_id2, relations are close paralogues and</span>
+<span class="sd">        homoeologues. If different, the relations are orthologues.</span>
+
+<span class="sd">        By using the paramaters `chr1` and `chr2`, it is possible to limit the</span>
+<span class="sd">        relations to a certain chromosome for one or both genomes. The ID of</span>
+<span class="sd">        the chromosome corresponds to the IDs in, for example::</span>
+
+<span class="sd">            from omadb import Client</span>
+<span class="sd">            c = Client()</span>
+<span class="sd">            r = c.genomes.genome(&#39;HUMAN&#39;)</span>
+<span class="sd">            human_inparalogues = list(c.pairwise(&#39;HUMAN&#39;,</span>
+<span class="sd">                                                 &#39;HUMAN&#39;,</span>
+<span class="sd">                                                 chr1=r.chromosomes[0].id,</span>
+<span class="sd">                                                 chr2=r.chromosomes[3].id,</span>
+<span class="sd">                                                 progress=True))</span>
+
+<span class="sd">        :param genome_id1: unique identifier for first genome - either NCBI taxonomic identifier or UniProt species code.</span>
+<span class="sd">        :type genome_id1: int or str</span>
+<span class="sd">        :param genome_id2: unique identifier for second genome - either NCBI taxonomic identifier or UniProt species code.</span>
+<span class="sd">        :type genome_id2: int or str</span>
+<span class="sd">        :param chr1: ID of chromosome of interest in first genome</span>
+<span class="sd">        :type chr1: str or None</span>
+<span class="sd">        :param chr2: ID of chromosome of interest in second genome</span>
+<span class="sd">        :type chr2: str or None</span>
+<span class="sd">        :param rel_type: relationship type (&#39;1:1&#39;, &#39;1:many&#39;, &#39;many:1&#39;, or &#39;many:many&#39;), optional</span>
+<span class="sd">        :param rel_type: str or None</span>
+
+<span class="sd">        :return: generator of pairwise relations.</span>
+<span class="sd">        :rtype: ClientPagedResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pairs&#39;</span><span class="p">,</span> <span class="n">genome_id2</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">genome_id1</span><span class="p">,</span>
+                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;chr1&#39;</span><span class="p">:</span> <span class="n">chr1</span><span class="p">,</span>
+                                             <span class="s1">&#39;chr2&#39;</span><span class="p">:</span> <span class="n">chr2</span><span class="p">,</span>
+                                             <span class="s1">&#39;rel_type&#39;</span><span class="p">:</span> <span class="n">rel_type</span><span class="p">},</span>
+                                     <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">progress_desc</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Loading pairs&#39;</span>
+                                                  <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Alex Warwick Vesztrocy
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
