@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.4 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.7 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.4
+                1.0.7
               </div>
             
           
@@ -253,6 +253,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">progress_desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_desc</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Iterates over all entries, silently lazily loading the next page when</span>
+<span class="sd">        required.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
 

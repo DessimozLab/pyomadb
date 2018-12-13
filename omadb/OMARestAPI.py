@@ -108,6 +108,10 @@ class ClientPagedResponse(object):
         self.progress_desc = ('' if progress_desc is None else progress_desc)
 
     def __iter__(self):
+        '''
+        Iterates over all entries, silently lazily loading the next page when
+        required.
+        '''
         r = self.response
         x = json.loads(r.content)
 

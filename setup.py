@@ -38,6 +38,7 @@ setup(
     author_email='alex@warwickvesztrocy.co.uk',
     url='https://github.com/DessimozLab/pyomadb',
     description=desc,
+    long_description=desc + '\n Documentation available `here <https://dessimozlab.github.io/pyomadb/build/html/>`_.',
     packages=find_packages(),
     install_requires=requirements,
     extras_require={'Taxonomy in Dendropy Tree': ['dendropy'],
