@@ -1,7 +1,7 @@
 PyOMADB
 =============
 
-PyOMADB is intended as a user-friendly wrapper around the OMA REST API.
+PyOMADB is intended as a user-friendly Python wrapper around the `OMA REST API <https://omabrowser.org/api>`_.
 
 Client
 ++++++
