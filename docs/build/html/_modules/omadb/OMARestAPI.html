@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.9 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.10 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.9
+                1.0.10
               </div>
             
           
@@ -589,7 +589,11 @@
                     <span class="k">return</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="p">{</span><span class="mi">400</span><span class="p">,</span> <span class="mi">404</span><span class="p">}:</span>
-                <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+
                 <span class="n">z</span> <span class="o">=</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;detail&#39;</span><span class="p">}:</span>
                     <span class="n">response_status</span> <span class="o">+=</span> <span class="s1">&#39;[&quot;&#39;</span> <span class="o">+</span> <span class="n">z</span><span class="o">.</span><span class="n">detail</span> <span class="o">+</span> <span class="s1">&#39;&quot;]&#39;</span>
@@ -665,6 +669,17 @@
              <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span>
                                              <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
         <span class="k">return</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genomes.as_dataframe"><a class="viewcode-back" href="../../index.html#omadb.Genomes.as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve information on all genomes in OMA, return as pandas data</span>
+<span class="sd">        frame.</span>
+
+<span class="sd">        :return: information on all genomes</span>
+<span class="sd">        :rtype: pd.DataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span>
+                                     <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_dataframe</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Genomes.genome"><a class="viewcode-back" href="../../index.html#omadb.Genomes.genome">[docs]</a>    <span class="k">def</span> <span class="nf">genome</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -960,7 +975,8 @@
             <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">GODag</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve any associations to Gene Ontology terms for a protein.</span>
 
@@ -968,6 +984,7 @@
 <span class="sd">        :type entry_id: str or int or list</span>
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 <span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional</span>
+<span class="sd">        :param bool progress: whether to show a progress bar during load (default False)</span>
 
 <span class="sd">        :return: gene ontology associations</span>
 <span class="sd">        :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</span>
@@ -977,7 +994,7 @@
 
             <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
                 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">entry_id</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Retrieving GO&#39;</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">progress</span><span class="p">):</span>
                     <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;query_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
                     <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
@@ -985,10 +1002,13 @@
                 <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">entry_id</span><span class="p">}</span>
+                     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span>
+                                   <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Retrieving GO&#39;</span><span class="p">,</span>
+                                   <span class="n">disable</span><span class="o">=</span><span class="n">progress</span><span class="p">)}</span>
 
                 <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
                     <span class="kn">from</span> <span class="nn">goatools.go_enrichment</span> <span class="k">import</span> <span class="n">GOEnrichmentStudy</span>
+                    
                     <span class="n">goea</span> <span class="o">=</span> <span class="n">GOEnrichmentStudy</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                                              <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">GO_term</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">}</span>
                                               <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
@@ -1468,10 +1488,10 @@
 <span class="sd">        :type genome_id2: int or str</span>
 <span class="sd">        :param chr1: ID of chromosome of interest in first genome</span>
 <span class="sd">        :type chr1: str or None</span>
-<span class="sd">        :param chr2: ID of chromosome of interest in second genome</span>
-<span class="sd">        :type chr2: str or None</span>
+<span class="sd">        :param chr2: ID of chromosome of interest in second genome :type chr2: str or None</span>
 <span class="sd">        :param rel_type: relationship type (&#39;1:1&#39;, &#39;1:many&#39;, &#39;many:1&#39;, or &#39;many:many&#39;), optional</span>
 <span class="sd">        :param rel_type: str or None</span>
+<span class="sd">        :param bool progress: whether to show a progress bar during load (default False)</span>
 
 <span class="sd">        :return: generator of pairwise relations.</span>
 <span class="sd">        :rtype: ClientPagedResponse</span>

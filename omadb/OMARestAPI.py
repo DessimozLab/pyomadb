@@ -444,7 +444,11 @@ class Client(object):
                     return ClientResponse(content, client=self)
         else:
             if r.status_code in {400, 404}:
-                content = json.loads(r.content)
+                try:
+                    content = json.loads(r.content)
+                except json.JSONDecodeError:
+                    content = {}
+
                 z = ClientResponse(content, client=self)
                 if set(z.keys()) == {'detail'}:
                     response_status += '["' + z.detail + '"]'
@@ -520,6 +524,17 @@ class Genomes(ClientFunctionSet):
              for sp in self._client._request(action='genome',
                                              paginated=True)}
         return ClientResponse(r, client=self._client)
+
+    def as_dataframe(self):
+        '''
+        Retrieve information on all genomes in OMA, return as pandas data
+        frame.
+
+        :return: information on all genomes
+        :rtype: pd.DataFrame
+        '''
+        return self._client._request(action='genome',
+                                     paginated=True).as_dataframe()
 
     def genome(self, genome_id):
         '''
@@ -815,7 +830,8 @@ class Entries(ClientFunctionSet):
             fp.write(r.content)
             return GODag(fp.name)
 
-    def gene_ontology(self, entry_id, as_dataframe=None, as_goatools=None):
+    def gene_ontology(self, entry_id, as_dataframe=None, as_goatools=None,
+                      progress=False, **kwargs):
         '''
         Retrieve any associations to Gene Ontology terms for a protein.
 
@@ -823,6 +839,7 @@ class Entries(ClientFunctionSet):
         :type entry_id: str or int or list
         :param bool as_dataframe: whether to return as pandas data frame, optional
         :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional
+        :param bool progress: whether to show a progress bar during load (default False)
 
         :return: gene ontology associations
         :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy
@@ -832,7 +849,7 @@ class Entries(ClientFunctionSet):
 
             if as_dataframe:
                 dfs = []
-                for x in entry_id:
+                for x in tqdm(entry_id, desc='Retrieving GO', disable=progress):
                     df = self.gene_ontology(x, as_dataframe=True)
                     df['query_id'] = x
                     dfs.append(df)
@@ -840,10 +857,13 @@ class Entries(ClientFunctionSet):
                 return pd.concat(dfs)
             else:
                 z = {x: self.gene_ontology(x)
-                     for x in entry_id}
+                     for x in tqdm(entry_id,
+                                   desc='Retrieving GO',
+                                   disable=progress)}
 
                 if as_goatools:
                     from goatools.go_enrichment import GOEnrichmentStudy
+                    
                     goea = GOEnrichmentStudy(z.keys(),
                                              {k: {x.GO_term for x in v}
                                               for (k, v) in z.items()},
@@ -1323,10 +1343,10 @@ class PairwiseRelations(ClientFunctionSet):
         :type genome_id2: int or str
         :param chr1: ID of chromosome of interest in first genome
         :type chr1: str or None
-        :param chr2: ID of chromosome of interest in second genome
-        :type chr2: str or None
+        :param chr2: ID of chromosome of interest in second genome :type chr2: str or None
         :param rel_type: relationship type ('1:1', '1:many', 'many:1', or 'many:many'), optional
         :param rel_type: str or None
+        :param bool progress: whether to show a progress bar during load (default False)
 
         :return: generator of pairwise relations.
         :rtype: ClientPagedResponse

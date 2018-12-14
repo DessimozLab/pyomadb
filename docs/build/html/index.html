@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyOMADB &mdash; PyOMADB 1.0.9 documentation</title>
+  <title>PyOMADB &mdash; PyOMADB 1.0.10 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.9
+                1.0.10
               </div>
             
           
@@ -313,6 +313,23 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="omadb.OMARestAPI.Genomes.as_dataframe">
+<code class="descname">as_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve information on all genomes in OMA, return as pandas data
+frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">information on all genomes</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="omadb.OMARestAPI.Genomes.genome">
 <code class="descname">genome</code><span class="sig-paren">(</span><em>genome_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.genome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve information on a genome in OMA.</p>
@@ -468,7 +485,7 @@
 
 <dl class="method">
 <dt id="omadb.OMARestAPI.Entries.gene_ontology">
-<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>as_dataframe=None</em>, <em>as_goatools=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>as_dataframe=None</em>, <em>as_goatools=None</em>, <em>progress=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve any associations to Gene Ontology terms for a protein.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -478,6 +495,7 @@
 <li><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>list</em>) – a unique identifier for a protein</li>
 <li><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</li>
 <li><strong>as_goatools</strong> (<em>bool</em>) – whether to return as GOATOOLS GOEA object, optional</li>
+<li><strong>progress</strong> (<em>bool</em>) – whether to show a progress bar during load (default False)</li>
 </ul>
 </td>
 </tr>
@@ -1131,9 +1149,10 @@ the chromosome corresponds to the IDs in, for example:</p>
 <li><strong>genome_id1</strong> (<em>int</em><em> or </em><em>str</em>) – unique identifier for first genome - either NCBI taxonomic identifier or UniProt species code.</li>
 <li><strong>genome_id2</strong> (<em>int</em><em> or </em><em>str</em>) – unique identifier for second genome - either NCBI taxonomic identifier or UniProt species code.</li>
 <li><strong>chr1</strong> (<em>str</em><em> or </em><em>None</em>) – ID of chromosome of interest in first genome</li>
-<li><strong>chr2</strong> (<em>str</em><em> or </em><em>None</em>) – ID of chromosome of interest in second genome</li>
+<li><strong>chr2</strong> – ID of chromosome of interest in second genome :type chr2: str or None</li>
 <li><strong>rel_type</strong> – relationship type (‘1:1’, ‘1:many’, ‘many:1’, or ‘many:many’), optional</li>
 <li><strong>rel_type</strong> – str or None</li>
+<li><strong>progress</strong> (<em>bool</em>) – whether to show a progress bar during load (default False)</li>
 </ul>
 </td>
 </tr>
