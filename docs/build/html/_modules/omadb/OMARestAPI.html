@@ -768,7 +768,7 @@
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 
 <span class="sd">        :return: list of members</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: list or pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">],</span>
                                   <span class="n">subject</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensure_hog_id</span><span class="p">(</span><span class="n">hog_id</span><span class="p">),</span>
@@ -970,7 +970,7 @@
 <span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional</span>
 
 <span class="sd">        :return: gene ontology associations</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">assert</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">as_goatools</span> <span class="ow">and</span> <span class="n">as_dataframe</span><span class="p">)),</span> <span class="s1">&#39;Cannot load both GOATOOLS and data frame!&#39;</span>
@@ -1209,7 +1209,7 @@
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 
 <span class="sd">        :return: sorted list of closely related groups</span>
-<span class="sd">        :rtype: list</span>
+<span class="sd">        :rtype: list or pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;close_groups&#39;</span><span class="p">],</span>
                                      <span class="n">subject</span><span class="o">=</span><span class="n">group_id</span><span class="p">,</span>

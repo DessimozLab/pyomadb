@@ -623,7 +623,7 @@ class HOGs(ClientFunctionSet):
         :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: list of members
-        :rtype: list
+        :rtype: list or pd.DataFrame
         '''
         z = self._client._request(action=['hog', 'members'],
                                   subject=self._ensure_hog_id(hog_id),
@@ -825,7 +825,7 @@ class Entries(ClientFunctionSet):
         :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional
 
         :return: gene ontology associations
-        :rtype: list
+        :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy
         '''
         if isinstance(entry_id, list):
             assert (not (as_goatools and as_dataframe)), 'Cannot load both GOATOOLS and data frame!'
@@ -1064,7 +1064,7 @@ class OMAGroups(ClientFunctionSet):
         :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: sorted list of closely related groups
-        :rtype: list
+        :rtype: list or pd.DataFrame
         '''
         return self._client._request(action=['group', 'close_groups'],
                                      subject=group_id,
