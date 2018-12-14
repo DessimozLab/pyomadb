@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyOMADB &mdash; PyOMADB 1.0.8 documentation</title>
+  <title>PyOMADB &mdash; PyOMADB 1.0.9 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.8
+                1.0.9
               </div>
             
           
@@ -468,15 +468,16 @@
 
 <dl class="method">
 <dt id="omadb.OMARestAPI.Entries.gene_ontology">
-<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>as_dataframe=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>as_dataframe=None</em>, <em>as_goatools=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve any associations to Gene Ontology terms for a protein.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em>) – a unique identifier for a protein</li>
+<li><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>list</em>) – a unique identifier for a protein</li>
 <li><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</li>
+<li><strong>as_goatools</strong> (<em>bool</em>) – whether to return as GOATOOLS GOEA object, optional</li>
 </ul>
 </td>
 </tr>
@@ -676,6 +677,44 @@
 </dd></dl>
 
 <dl class="method">
+<dt id="omadb.OMARestAPI.HOGs.analyse">
+<code class="descname">analyse</code><span class="sig-paren">(</span><em>hog_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.analyse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.analyse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the PyHAM package to analyse a particular hierarchical orthologous
+group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hog_id</strong> (<em>str</em><em> or </em><em>int</em>) – unique identifier for a HOG, either HOG ID or one of its member proteins</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">analysis object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pyham.Ham</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="omadb.OMARestAPI.HOGs.analyze">
+<code class="descname">analyze</code><span class="sig-paren">(</span><em>hog_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the PyHAM package to analyse a particular hierarchical orthologous
+group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hog_id</strong> (<em>str</em><em> or </em><em>int</em>) – unique identifier for a HOG, either HOG ID or one of its member proteins</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">analysis object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pyham.Ham</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="omadb.OMARestAPI.HOGs.at_level">
 <code class="descname">at_level</code><span class="sig-paren">(</span><em>level</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.at_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.at_level" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve list of HOGs at a particular level</p>
@@ -712,6 +751,20 @@
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="omadb.OMARestAPI.HOGs.iham">
+<code class="descname">iham</code><span class="sig-paren">(</span><em>hog_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.iham"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.iham" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an iHam page and print path to temporary file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hog_id</strong> (<em>str</em><em> or </em><em>int</em>) – unique identifier for a HOG, either HOG ID or one of its member proteins</td>
 </tr>
 </tbody>
 </table>
@@ -778,7 +831,7 @@
 
 <dl class="method">
 <dt id="omadb.OMARestAPI.HOGs.xrefs">
-<code class="descname">xrefs</code><span class="sig-paren">(</span><em>hog_id</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.xrefs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.xrefs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">xrefs</code><span class="sig-paren">(</span><em>hog_id</em>, <em>level=None</em>, <em>type=None</em>, <em>as_dataframe=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.xrefs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.xrefs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve external references for all members of a particular HOG.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -787,13 +840,14 @@
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>hog_id</strong> (<em>str</em><em> or </em><em>int</em>) – unique identifier for a HOG, either HOG ID or one of its member proteins</li>
 <li><strong>level</strong> (<em>str</em>) – level of interest</li>
+<li><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">external references</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict or pd.DataFrame</p>
 </td>
 </tr>
 </tbody>
@@ -1141,7 +1195,8 @@ the chromosome corresponds to the IDs in, for example:</p>
 <dl class="class">
 <dt id="omadb.OMARestAPI.ClientResponse">
 <em class="property">class </em><code class="descclassname">omadb.OMARestAPI.</code><code class="descname">ClientResponse</code><span class="sig-paren">(</span><em>response</em>, <em>client=None</em>, <em>_is_paginated=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientResponse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientResponse" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Bases: <a class="reference internal" href="#omadb.OMARestAPI.AttrDict" title="omadb.OMARestAPI.AttrDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">omadb.OMARestAPI.AttrDict</span></code></a></p>
+</dd></dl>
 
 </div>
 <div class="section" id="attrdict">
@@ -1162,6 +1217,31 @@ the chromosome corresponds to the IDs in, for example:</p>
 <code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterates over all entries, silently lazily loading the next page when
 required.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="omadb.OMARestAPI.ClientPagedResponse.as_dataframe">
+<code class="descname">as_dataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse.as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse.as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves all entries, from all pages. Returns as pandas data frame.</p>
+<p>Note: in general, it would be better to use iter_dataframes to deal
+with the returned entries in chunks (if possible).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">data frame containing all entries in response</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="omadb.OMARestAPI.ClientPagedResponse.iter_dataframes">
+<code class="descname">iter_dataframes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse.iter_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse.iter_dataframes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields dataframes for each page of response. That is, entries are
+yielded in chunks.</p>
 </dd></dl>
 
 </dd></dl>

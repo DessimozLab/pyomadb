@@ -20,9 +20,11 @@
 '''
 from collections import defaultdict
 from functools import lru_cache
+from io import StringIO
 from pprint import pformat
 from property_manager import lazy_property
 from requests_cache.core import CachedSession
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from urllib.request import quote as uri_quote
 from tqdm import tqdm
 import appdirs
@@ -30,6 +32,7 @@ import json
 import numbers
 import os
 import pandas as pd
+import random
 import requests
 import shutil
 import warnings
@@ -274,6 +277,8 @@ class Client(object):
             self._version_check()
             self._setup_cache()
         self._setup()
+
+        self._temp_path = TemporaryDirectory()
 
     def clear_cache(self):
         '''
@@ -641,19 +646,104 @@ class HOGs(ClientFunctionSet):
         '''
         return self.xrefs(hog_id, type=type)
 
-    def xrefs(self, hog_id, type=None):
+    def xrefs(self, hog_id, level=None, type=None, as_dataframe=None):
         '''
         Retrieve external references for all members of a particular HOG.
 
         :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
         :type hog_id: str or int
         :param str level: level of interest
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: external references
-        :rtype: dict
+        :rtype: dict or pd.DataFrame
         '''
-        return {m['omaid']: self._client.entries.xrefs(m['entry_nr'], type)
-                for m in self.members(hog_id, level=level)}
+        if as_dataframe:
+            if type is not None:
+                return pd.DataFrame.from_records({'omaid': m['omaid'],
+                                                  'xref': x}
+                                                 for m in self.members(hog_id, level=level)
+                                                 for x in self._client.entries.xrefs(m['entry_nr'], type))
+            else:
+                return pd.DataFrame.from_records({'omaid': m['omaid'],
+                                                  'type': xtype,
+                                                  'xref': x}
+                                                 for m in self.members(hog_id, level=level)
+                                                 for (xtype, xs) in
+                                                 self._client.entries.xrefs(m['entry_nr']).items()
+                                                 for x in xs)
+        else:
+            return {m['omaid']: self._client.entries.xrefs(m['entry_nr'], type)
+                    for m in self.members(hog_id, level=level)}
+
+    def analyze(self, hog_id):
+        '''
+        Use the PyHAM package to analyse a particular hierarchical orthologous
+        group.
+        
+        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
+        :type hog_id: str or int
+
+        :return: analysis object
+        :rtype: pyham.Ham
+        '''
+        return self.analyse(hog_id)
+
+    def analyse(self, hog_id):
+        '''
+        Use the PyHAM package to analyse a particular hierarchical orthologous
+        group.
+        
+        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
+        :type hog_id: str or int
+
+        :return: analysis object
+        :rtype: pyham.Ham
+        '''
+        try:
+            from pyham import Ham
+        except ImportError:
+            raise ImportError('For HOG analysis, the pyham package is '
+                              'required.')
+
+        z = self[self[hog_id].roothog_id]
+        m = z.members_url.members[0].omaid
+        root_level = z.level
+
+        try:
+            r = requests.get('https://omabrowser.org/oma/hogs/{}/orthoxml'.format(m),
+                             timeout=self._client.TIMEOUT)
+        except requests.exceptions.Timeout:
+            raise ClientTimeout('OrthoXML request timed out after'
+                                '{}s.'.format(self.TIMEOUT))
+
+        xml = self._client.taxonomy.get(members=[root_level],
+                                        format='phyloxml').decode('ascii')
+        t = StringIO(xml)
+        return Ham(tree_file=t,
+                   hog_file=r.content.decode('utf-8'),
+                   orthoXML_as_string=True,
+                   tree_format='phyloxml',
+                   use_internal_name=True)
+
+    def iham(self, hog_id):
+        '''
+        Create an iHam page and print path to temporary file.
+
+        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
+        :type hog_id: str or int
+        '''
+        z = self.analyse(hog_id)
+        iham = z.create_iHam(list(z.top_level_hogs.values())[0])
+
+        while True:
+            fn = os.path.join(self._client._temp_path.name,
+                              'iham{:06d}.html'.format(random.randint(0,999999)))
+            if not os.path.isfile(fn):
+                break
+        with open(fn, 'wt') as fp:
+            fp.write(iham.HTML)
+        print('{}'.format(fn))
 
 
 class Entries(ClientFunctionSet):
@@ -711,20 +801,65 @@ class Entries(ClientFunctionSet):
         return self._client._request(action=['protein', 'domains'],
                                      subject=entry_id)
 
-    def gene_ontology(self, entry_id, as_dataframe=None):
+    @lazy_property
+    def _gene_ontology(self):
+        from goatools.obo_parser import GODag
+        url = 'http://purl.obolibrary.org/obo/go/go-basic.obo'
+        try:
+            r = requests.get(url, timeout=self._client.TIMEOUT)
+        except requests.exceptions.Timeout:
+            raise ClientTimeout('Gene Ontology download request '
+                                'timed out after '
+                                '{}s.'.format(self.TIMEOUT))
+        with NamedTemporaryFile(suffix='.obo') as fp:
+            fp.write(r.content)
+            return GODag(fp.name)
+
+    def gene_ontology(self, entry_id, as_dataframe=None, as_goatools=None):
         '''
         Retrieve any associations to Gene Ontology terms for a protein.
 
         :param entry_id: a unique identifier for a protein
-        :type entry_id: str or int
+        :type entry_id: str or int or list
         :param bool as_dataframe: whether to return as pandas data frame, optional
+        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional
 
         :return: gene ontology associations
         :rtype: list
         '''
-        return self._client._request(action=['protein', 'ontology'],
-                                     subject=entry_id,
-                                     as_dataframe=as_dataframe)
+        if isinstance(entry_id, list):
+            assert (not (as_goatools and as_dataframe)), 'Cannot load both GOATOOLS and data frame!'
+
+            if as_dataframe:
+                dfs = []
+                for x in entry_id:
+                    df = self.gene_ontology(x, as_dataframe=True)
+                    df['query_id'] = x
+                    dfs.append(df)
+
+                return pd.concat(dfs)
+            else:
+                z = {x: self.gene_ontology(x)
+                     for x in entry_id}
+
+                if as_goatools:
+                    from goatools.go_enrichment import GOEnrichmentStudy
+                    goea = GOEnrichmentStudy(z.keys(),
+                                             {k: {x.GO_term for x in v}
+                                              for (k, v) in z.items()},
+                                             self._gene_ontology,
+                                             methods=['fdr_bh'])
+                    return goea
+                else:
+                    return z
+
+        else:
+            if as_goatools:
+                raise ValueError('Not possible to load GOEA object for single '
+                                 'entry.')
+            return self._client._request(action=['protein', 'ontology'],
+                                         subject=entry_id,
+                                         as_dataframe=as_dataframe)
 
     def homoeologs(self, entry_id):
         '''

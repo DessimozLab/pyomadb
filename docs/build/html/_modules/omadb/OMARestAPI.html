@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.8 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.9 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.8
+                1.0.9
               </div>
             
           
@@ -165,9 +165,11 @@
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
 <span class="kn">from</span> <span class="nn">property_manager</span> <span class="k">import</span> <span class="n">lazy_property</span>
 <span class="kn">from</span> <span class="nn">requests_cache.core</span> <span class="k">import</span> <span class="n">CachedSession</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span><span class="p">,</span> <span class="n">TemporaryDirectory</span>
 <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">uri_quote</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">appdirs</span>
@@ -175,6 +177,7 @@
 <span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -312,7 +315,7 @@
                                         <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="n">pbar</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ClientPagedResponse.as_dataframe"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse.as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieves all entries, from all pages. Returns as pandas data frame.</span>
 
@@ -322,9 +325,9 @@
 <span class="sd">        :return: data frame containing all entries in response</span>
 <span class="sd">        :rtype: pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_dataframes</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_dataframes</span><span class="p">())</span></div>
 
-    <span class="k">def</span> <span class="nf">iter_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ClientPagedResponse.iter_dataframes"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse.iter_dataframes">[docs]</a>    <span class="k">def</span> <span class="nf">iter_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Yields dataframes for each page of response. That is, entries are</span>
 <span class="sd">        yielded in chunks.</span>
@@ -348,7 +351,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_yield_elts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_add_lazy_calls</span><span class="p">,</span>
                                  <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
                                  <span class="n">pbar</span><span class="p">))</span>
-        <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">ClientRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -418,7 +421,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">CACHE_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">persistent_cache_path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_version_check</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup_cache</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_path</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Client.clear_cache"><a class="viewcode-back" href="../../index.html#omadb.Client.clear_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -786,19 +791,104 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HOGs.xrefs"><a class="viewcode-back" href="../../index.html#omadb.HOGs.xrefs">[docs]</a>    <span class="k">def</span> <span class="nf">xrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="HOGs.xrefs"><a class="viewcode-back" href="../../index.html#omadb.HOGs.xrefs">[docs]</a>    <span class="k">def</span> <span class="nf">xrefs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve external references for all members of a particular HOG.</span>
 
 <span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
 <span class="sd">        :type hog_id: str or int</span>
 <span class="sd">        :param str level: level of interest</span>
+<span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 
 <span class="sd">        :return: external references</span>
-<span class="sd">        :rtype: dict</span>
+<span class="sd">        :rtype: dict or pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;omaid&#39;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;entry_nr&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)}</span></div></div>
+        <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">({</span><span class="s1">&#39;omaid&#39;</span><span class="p">:</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;omaid&#39;</span><span class="p">],</span>
+                                                  <span class="s1">&#39;xref&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span>
+                                                 <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+                                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;entry_nr&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">({</span><span class="s1">&#39;omaid&#39;</span><span class="p">:</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;omaid&#39;</span><span class="p">],</span>
+                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">xtype</span><span class="p">,</span>
+                                                  <span class="s1">&#39;xref&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span>
+                                                 <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)</span>
+                                                 <span class="k">for</span> <span class="p">(</span><span class="n">xtype</span><span class="p">,</span> <span class="n">xs</span><span class="p">)</span> <span class="ow">in</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;entry_nr&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;omaid&#39;</span><span class="p">]:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">entries</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;entry_nr&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">)}</span></div>
+
+<div class="viewcode-block" id="HOGs.analyze"><a class="viewcode-back" href="../../index.html#omadb.HOGs.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Use the PyHAM package to analyse a particular hierarchical orthologous</span>
+<span class="sd">        group.</span>
+<span class="sd">        </span>
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+
+<span class="sd">        :return: analysis object</span>
+<span class="sd">        :rtype: pyham.Ham</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyse</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.analyse"><a class="viewcode-back" href="../../index.html#omadb.HOGs.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Use the PyHAM package to analyse a particular hierarchical orthologous</span>
+<span class="sd">        group.</span>
+<span class="sd">        </span>
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+
+<span class="sd">        :return: analysis object</span>
+<span class="sd">        :rtype: pyham.Ham</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pyham</span> <span class="k">import</span> <span class="n">Ham</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;For HOG analysis, the pyham package is &#39;</span>
+                              <span class="s1">&#39;required.&#39;</span><span class="p">)</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">hog_id</span><span class="p">]</span><span class="o">.</span><span class="n">roothog_id</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">members_url</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">omaid</span>
+        <span class="n">root_level</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">level</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;https://omabrowser.org/oma/hogs/</span><span class="si">{}</span><span class="s1">/orthoxml&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m</span><span class="p">),</span>
+                             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClientTimeout</span><span class="p">(</span><span class="s1">&#39;OrthoXML request timed out after&#39;</span>
+                                <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">))</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">members</span><span class="o">=</span><span class="p">[</span><span class="n">root_level</span><span class="p">],</span>
+                                        <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;phyloxml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Ham</span><span class="p">(</span><span class="n">tree_file</span><span class="o">=</span><span class="n">t</span><span class="p">,</span>
+                   <span class="n">hog_file</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                   <span class="n">orthoXML_as_string</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">tree_format</span><span class="o">=</span><span class="s1">&#39;phyloxml&#39;</span><span class="p">,</span>
+                   <span class="n">use_internal_name</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.iham"><a class="viewcode-back" href="../../index.html#omadb.HOGs.iham">[docs]</a>    <span class="k">def</span> <span class="nf">iham</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Create an iHam page and print path to temporary file.</span>
+
+<span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
+<span class="sd">        :type hog_id: str or int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyse</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span>
+        <span class="n">iham</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">create_iHam</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">top_level_hogs</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_temp_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                              <span class="s1">&#39;iham</span><span class="si">{:06d}</span><span class="s1">.html&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">999999</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">iham</span><span class="o">.</span><span class="n">HTML</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fn</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="Entries"><a class="viewcode-back" href="../../index.html#omadb.Entries">[docs]</a><span class="k">class</span> <span class="nc">Entries</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
@@ -856,20 +946,65 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;domains&#39;</span><span class="p">],</span>
                                      <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="nd">@lazy_property</span>
+    <span class="k">def</span> <span class="nf">_gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">goatools.obo_parser</span> <span class="k">import</span> <span class="n">GODag</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://purl.obolibrary.org/obo/go/go-basic.obo&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">Timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ClientTimeout</span><span class="p">(</span><span class="s1">&#39;Gene Ontology download request &#39;</span>
+                                <span class="s1">&#39;timed out after &#39;</span>
+                                <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.obo&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">GODag</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve any associations to Gene Ontology terms for a protein.</span>
 
 <span class="sd">        :param entry_id: a unique identifier for a protein</span>
-<span class="sd">        :type entry_id: str or int</span>
+<span class="sd">        :type entry_id: str or int or list</span>
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
+<span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional</span>
 
 <span class="sd">        :return: gene ontology associations</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
-                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
-                                     <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">as_goatools</span> <span class="ow">and</span> <span class="n">as_dataframe</span><span class="p">)),</span> <span class="s1">&#39;Cannot load both GOATOOLS and data frame!&#39;</span>
+
+            <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+                <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">entry_id</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;query_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+                    <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">entry_id</span><span class="p">}</span>
+
+                <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">goatools.go_enrichment</span> <span class="k">import</span> <span class="n">GOEnrichmentStudy</span>
+                    <span class="n">goea</span> <span class="o">=</span> <span class="n">GOEnrichmentStudy</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+                                             <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">GO_term</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">}</span>
+                                              <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">_gene_ontology</span><span class="p">,</span>
+                                             <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fdr_bh&#39;</span><span class="p">])</span>
+                    <span class="k">return</span> <span class="n">goea</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">z</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not possible to load GOEA object for single &#39;</span>
+                                 <span class="s1">&#39;entry.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
+                                         <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+                                         <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Entries.homoeologs"><a class="viewcode-back" href="../../index.html#omadb.Entries.homoeologs">[docs]</a>    <span class="k">def</span> <span class="nf">homoeologs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>

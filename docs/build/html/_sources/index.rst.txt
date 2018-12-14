@@ -113,6 +113,7 @@ ExternalReferences
 ClientResponse
 ++++++++++++++
 .. autoclass:: omadb.OMARestAPI.ClientResponse
+  :show-inheritance:
 
 AttrDict
 ++++++++
@@ -121,6 +122,7 @@ AttrDict
 ClientPagedResponse
 +++++++++++++++++++
 .. autoclass:: omadb.OMARestAPI.ClientPagedResponse
+  :members:
 
   .. automethod:: __iter__
 

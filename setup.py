@@ -27,7 +27,7 @@ with open('{:s}/__init__.py'.format(name), 'rt') as fp:
             exec(line.rstrip())
 
 requirements = ['pprint', 'property_manager', 'requests_cache', 'tqdm',
-                'appdirs', 'dendropy', 'requests']
+                'appdirs', 'requests', 'pandas']
 
 desc = 'Client to the OMA browser, using the REST API.'
 
@@ -42,6 +42,8 @@ setup(
     packages=find_packages(),
     install_requires=requirements,
     extras_require={'Taxonomy in Dendropy Tree': ['dendropy'],
-                    'Taxonomy in ETE Tree': ['ete3']},
+                    'Taxonomy in ETE Tree': ['ete3'],
+                    'Gene Ontology enrichment analyses': ['goatools'],
+                    'HOG analysis': ['pyham']},
     python_requires=">=3.6",
     license='LGPLv3')
