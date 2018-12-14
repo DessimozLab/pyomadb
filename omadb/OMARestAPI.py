@@ -860,7 +860,7 @@ class Entries(ClientFunctionSet):
                 z = {x: self.gene_ontology(x)
                      for x in tqdm(entry_id,
                                    desc='Retrieving GO',
-                                   disable=progress)}
+                                   disable=(not progress))}
 
                 if as_goatools:
                     from goatools.go_enrichment import GOEnrichmentStudy
