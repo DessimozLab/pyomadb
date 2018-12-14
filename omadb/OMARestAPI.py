@@ -849,7 +849,8 @@ class Entries(ClientFunctionSet):
 
             if as_dataframe:
                 dfs = []
-                for x in tqdm(entry_id, desc='Retrieving GO', disable=progress):
+                for x in tqdm(entry_id, desc='Retrieving GO',
+                              disable=(not progress)):
                     df = self.gene_ontology(x, as_dataframe=True)
                     df['query_id'] = x
                     dfs.append(df)
