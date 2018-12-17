@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyOMADB &mdash; PyOMADB 1.0.12 documentation</title>
+  <title>PyOMADB &mdash; PyOMADB 1.0.13 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.12
+                1.0.13
               </div>
             
           
@@ -485,7 +485,7 @@ frame.</p>
 
 <dl class="method">
 <dt id="omadb.OMARestAPI.Entries.gene_ontology">
-<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>as_dataframe=None</em>, <em>as_goatools=None</em>, <em>progress=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gene_ontology</code><span class="sig-paren">(</span><em>entry_id</em>, <em>aspect=None</em>, <em>as_dataframe=None</em>, <em>as_goatools=None</em>, <em>progress=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries.gene_ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries.gene_ontology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve any associations to Gene Ontology terms for a protein.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -493,6 +493,7 @@ frame.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>list</em>) – a unique identifier for a protein</li>
+<li><strong>aspect</strong> (<em>str</em>) – GO aspect - biological process (BP), cellular component (CC), molecular function (MF)</li>
 <li><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</li>
 <li><strong>as_goatools</strong> (<em>bool</em>) – whether to return as GOATOOLS GOEA object, optional</li>
 <li><strong>progress</strong> (<em>bool</em>) – whether to show a progress bar during load (default False)</li>

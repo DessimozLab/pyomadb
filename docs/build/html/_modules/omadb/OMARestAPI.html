@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.12 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.13 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.12
+                1.0.13
               </div>
             
           
@@ -975,13 +975,14 @@
             <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">GODag</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve any associations to Gene Ontology terms for a protein.</span>
 
 <span class="sd">        :param entry_id: a unique identifier for a protein</span>
 <span class="sd">        :type entry_id: str or int or list</span>
+<span class="sd">        :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)</span>
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 <span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional</span>
 <span class="sd">        :param bool progress: whether to show a progress bar during load (default False)</span>
@@ -996,13 +997,14 @@
                 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Retrieving GO&#39;</span><span class="p">,</span>
                               <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">progress</span><span class="p">)):</span>
-                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;query_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;query_id&#39;</span><span class="p">)</span>
                     <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">z</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">gene_ontology</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="n">aspect</span><span class="p">)</span>
                      <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span>
                                    <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Retrieving GO&#39;</span><span class="p">,</span>
                                    <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">progress</span><span class="p">))}</span>
@@ -1023,9 +1025,24 @@
             <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not possible to load GOEA object for single &#39;</span>
                                  <span class="s1">&#39;entry.&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
-                                         <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
-                                         <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span></div>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
+                                      <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
+                                      <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">aspect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">z</span>
+            
+            <span class="c1"># Translate</span>
+            <span class="n">aspects</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bp&#39;</span><span class="p">:</span> <span class="s1">&#39;biological_process&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;cc&#39;</span><span class="p">:</span> <span class="s1">&#39;cellular_component&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;mf&#39;</span><span class="p">:</span> <span class="s1">&#39;molecular_function&#39;</span><span class="p">}</span>
+            <span class="n">valid_aspects</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">aspects</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="n">aspects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">aspect</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">aspect</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="p">(</span><span class="n">aspect</span> <span class="ow">in</span> <span class="n">valid_aspects</span><span class="p">),</span> <span class="s1">&#39;Unknown aspect: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">aspect</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">z</span><span class="p">[</span><span class="n">z</span><span class="o">.</span><span class="n">aspect</span> <span class="o">==</span> <span class="n">aspect</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">aspect</span> <span class="o">==</span> <span class="n">aspect</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Entries.homoeologs"><a class="viewcode-back" href="../../index.html#omadb.Entries.homoeologs">[docs]</a>    <span class="k">def</span> <span class="nf">homoeologs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>

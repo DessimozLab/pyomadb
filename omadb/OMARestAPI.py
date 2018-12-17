@@ -830,13 +830,14 @@ class Entries(ClientFunctionSet):
             fp.write(r.content)
             return GODag(fp.name)
 
-    def gene_ontology(self, entry_id, as_dataframe=None, as_goatools=None,
-                      progress=False, **kwargs):
+    def gene_ontology(self, entry_id, aspect=None, as_dataframe=None,
+                      as_goatools=None, progress=False, **kwargs):
         '''
         Retrieve any associations to Gene Ontology terms for a protein.
 
         :param entry_id: a unique identifier for a protein
         :type entry_id: str or int or list
+        :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
         :param bool as_dataframe: whether to return as pandas data frame, optional
         :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional
         :param bool progress: whether to show a progress bar during load (default False)
@@ -851,13 +852,14 @@ class Entries(ClientFunctionSet):
                 dfs = []
                 for x in tqdm(entry_id, desc='Retrieving GO',
                               disable=(not progress)):
-                    df = self.gene_ontology(x, as_dataframe=True)
+                    df = self.gene_ontology(x, aspect=aspect, as_dataframe=True)
                     df['query_id'] = x
+                    df = df.set_index('query_id')
                     dfs.append(df)
 
                 return pd.concat(dfs)
             else:
-                z = {x: self.gene_ontology(x)
+                z = {x: self.gene_ontology(x, aspect=aspect)
                      for x in tqdm(entry_id,
                                    desc='Retrieving GO',
                                    disable=(not progress))}
@@ -878,9 +880,24 @@ class Entries(ClientFunctionSet):
             if as_goatools:
                 raise ValueError('Not possible to load GOEA object for single '
                                  'entry.')
-            return self._client._request(action=['protein', 'ontology'],
-                                         subject=entry_id,
-                                         as_dataframe=as_dataframe)
+            z = self._client._request(action=['protein', 'ontology'],
+                                      subject=entry_id,
+                                      as_dataframe=as_dataframe)
+            if aspect is None:
+                return z
+            
+            # Translate
+            aspects = {'bp': 'biological_process',
+                       'cc': 'cellular_component',
+                       'mf': 'molecular_function'}
+            valid_aspects = set(aspects.values())
+            aspect = aspects.get(aspect.lower(), aspect)
+
+            assert (aspect in valid_aspects), 'Unknown aspect: {}'.format(aspect)
+            if as_dataframe:
+                return z[z.aspect == aspect]
+            else:
+                return list(filter(lambda x: x.aspect == aspect, z))
 
     def homoeologs(self, entry_id):
         '''
