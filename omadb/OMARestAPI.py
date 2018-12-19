@@ -880,7 +880,7 @@ class Entries(ClientFunctionSet):
             if as_goatools:
                 raise ValueError('Not possible to load GOEA object for single '
                                  'entry.')
-            z = self._client._request(action=['protein', 'ontology'],
+            z = self._client._request(action=['protein', 'gene_ontology'],
                                       subject=entry_id,
                                       as_dataframe=as_dataframe)
             if aspect is None:
