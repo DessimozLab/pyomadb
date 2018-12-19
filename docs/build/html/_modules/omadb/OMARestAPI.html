@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.14 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.15 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.14
+                1.0.15
               </div>
             
           
@@ -1025,7 +1025,7 @@
             <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not possible to load GOEA object for single &#39;</span>
                                  <span class="s1">&#39;entry.&#39;</span><span class="p">)</span>
-            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;ontology&#39;</span><span class="p">],</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;gene_ontology&#39;</span><span class="p">],</span>
                                       <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
                                       <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">aspect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

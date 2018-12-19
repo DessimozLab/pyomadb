@@ -41,9 +41,9 @@ setup(
     long_description=desc + '\n Documentation available `here <https://dessimozlab.github.io/pyomadb/build/html/>`_.',
     packages=find_packages(),
     install_requires=requirements,
-    extras_require={'Taxonomy in Dendropy Tree': ['dendropy'],
-                    'Taxonomy in ETE Tree': ['ete3'],
-                    'Gene Ontology enrichment analyses': ['goatools'],
-                    'HOG analysis': ['pyham']},
+    extras_require={'dendropy': ['dendropy'],
+                    'ete3': ['ete3'],
+                    'goea': ['goatools'],
+                    'hog_analysis': ['pyham']},
     python_requires=">=3.6",
     license='LGPLv3')
