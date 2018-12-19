@@ -1,9 +1,13 @@
-name: pyomadb-environment
+name: pyomadb-examples-environment
 channels:
   - conda-forge
 dependencies:
   - python>=3.6
   - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scipy
   - pip:
     - omadb
     - goatools
