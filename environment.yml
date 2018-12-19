@@ -1,0 +1,11 @@
+name: pyomadb-environment
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.6
+  - pandas
+  - pip:
+    - omadb
+    - goatools
+    - dendropy
+    - ete3
