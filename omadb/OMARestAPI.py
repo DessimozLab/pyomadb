@@ -1033,18 +1033,20 @@ class Function(ClientFunctionSet):
         c = Client()
         gos = c.function('ATCATATCAT')
     '''
-    def __call__(self, seq):
+    def __call__(self, seq, as_dataframe=None):
         '''
         Annotate a sequence with GO terms based on annotations stored in the
         OMA database.
 
         :param str query: query sequence
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: results of fast function prediction
-        :rtype: ClientResponse
+        :rtype: list or pd.DataFrame
         '''
         return self._client._request(action='function',
-                                     params={'query': seq})
+                                     params={'query': seq},
+                                     as_dataframe=as_dataframe)
 
 
 class OMAGroups(ClientFunctionSet):

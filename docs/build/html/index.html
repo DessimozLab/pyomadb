@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PyOMADB &mdash; PyOMADB 1.0.13 documentation</title>
+  <title>PyOMADB &mdash; PyOMADB 1.0.14 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.13
+                1.0.14
               </div>
             
           
@@ -982,18 +982,24 @@ group.</p>
 </div>
 <dl class="method">
 <dt id="omadb.OMARestAPI.Function.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>seq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Function.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>seq</em>, <em>as_dataframe=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#omadb.OMARestAPI.Function.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotate a sequence with GO terms based on annotations stored in the
 OMA database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query</strong> (<em>str</em>) – query sequence</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>query</strong> (<em>str</em>) – query sequence</li>
+<li><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">results of fast function prediction</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">results of fast function prediction</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#omadb.OMARestAPI.ClientResponse" title="omadb.OMARestAPI.ClientResponse">ClientResponse</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list or pd.DataFrame</p>
+</td>
 </tr>
 </tbody>
 </table>
