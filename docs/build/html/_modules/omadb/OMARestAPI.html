@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.13 documentation</title>
+  <title>omadb.OMARestAPI &mdash; PyOMADB 1.0.14 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.13
+                1.0.14
               </div>
             
           
@@ -1178,18 +1178,20 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        gos = c.function(&#39;ATCATATCAT&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../index.html#omadb.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../index.html#omadb.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Annotate a sequence with GO terms based on annotations stored in the</span>
 <span class="sd">        OMA database.</span>
 
 <span class="sd">        :param str query: query sequence</span>
+<span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
 
 <span class="sd">        :return: results of fast function prediction</span>
-<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        :rtype: list or pd.DataFrame</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">,</span>
-                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="n">seq</span><span class="p">})</span></div></div>
+                                     <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="n">seq</span><span class="p">},</span>
+                                     <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="OMAGroups"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups">[docs]</a><span class="k">class</span> <span class="nc">OMAGroups</span><span class="p">(</span><span class="n">ClientFunctionSet</span><span class="p">):</span>
