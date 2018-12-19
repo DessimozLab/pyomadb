@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python>=3.6
   - pandas
+  - PyQt4
   - pip:
     - omadb
     - goatools
