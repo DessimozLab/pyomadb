@@ -6,15 +6,15 @@ Documentation is available <a href="http://dessimozlab.github.io/pyomadb/build/h
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/DessimozLab/pyomadb/master?filepath=examples%2Fpyomadb-examples.ipynb)
 
-## How to cite PyOMADB
-If you use PyOMADB in your work, please consider citing:
+## Citation
+If you use our package in your work, please consider citing:
 
 _Kaleb K, Warwick Vesztrocy A, Altenhoff A and Dessimoz C. Expanding the Orthologous Matrix (OMA) programmatic interfaces: REST API and the OmaDB packages for R and Python. F1000Research 2019, 8:42
 (https://doi.org/10.12688/f1000research.17548.1)_
 
 ## Installation
 
-PyOMADB requires Python 3 (>=3.6). The easiest way to install is using `pip`.
+The package requires Python 3 (>=3.6). The easiest way to install is using `pip`.
 
 ```
 pip install omadb
@@ -50,7 +50,7 @@ seq = 'MKLVFLVLLFLGALGLCLAGRRRSVQWCAVSQPEATKCFQWQRNMRKVRGPPVSCIKRDSPIQCIQAIAENRA
 r = c.proteins.search(seq)
 ```
 
-For further examples that match those given in the paper, see the <a href="https://github.com/DessimozLab/pyomadb/blob/master/examples/pyomadb-examples.ipynb">Jupyter notebook</a>, which is also available on <a href="https://mybinder.org/v2/gh/DessimozLab/pyomadb/master?filepath=examples%2Fpyomadb-examples.ipynb">mybinder</a>.
+For further examples that correspond to the `R` versions given in the paper, see the <a href="https://github.com/DessimozLab/pyomadb/blob/master/examples/pyomadb-examples.ipynb">Jupyter notebook</a>, which is also available on <a href="https://mybinder.org/v2/gh/DessimozLab/pyomadb/master?filepath=examples%2Fpyomadb-examples.ipynb">mybinder</a>.
 
 
 ## License
