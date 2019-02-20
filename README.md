@@ -14,7 +14,7 @@ _Kaleb K, Warwick Vesztrocy A, Altenhoff A and Dessimoz C. Expanding the Ortholo
 
 ## Installation
 
-The package requires Python 3 (>=3.6). The easiest way to install is using `pip`.
+The package requires Python 3 (>=3.6). The easiest way to install is using `pip`, to install the <a href="https://pypi.org/project/omadb/">package from PyPI</a>.
 
 ```
 pip install omadb
