@@ -1,6 +1,6 @@
 # PyOMADB
 
-PyOMADB is a python client to the OMA browser, using the REST API. As such, it requires a stable internet connection to operate.
+PyOMADB is a python client to the OMA browser, using the REST API. As such, it requires a stable internet connection to operate. We also provide a _similar wrapper for R (https://github.com/DessimozLab/omadb)_.
 
 Documentation is available <a href="http://dessimozlab.github.io/pyomadb/build/html/">here</a>. A notebook containing examples of how to use the package is available <a href="https://github.com/DessimozLab/pyomadb/blob/master/examples/pyomadb-examples.ipynb">here</a>.
 
