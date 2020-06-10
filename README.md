@@ -52,6 +52,25 @@ r = c.proteins.search(seq)
 
 For further examples that correspond to the `R` versions given in the paper, see the <a href="https://github.com/DessimozLab/pyomadb/blob/master/examples/pyomadb-examples.ipynb">Jupyter notebook</a>, which is also available on <a href="https://mybinder.org/v2/gh/DessimozLab/pyomadb/master?filepath=examples%2Fpyomadb-examples.ipynb">mybinder</a>.
 
+## Corona-OMA Example
+
+In order to facilitate the functional and evolutionary aspects of coronaviruses, the new <a href="https://corona.omabrowser.org/">Corona OMA Browser</a> has been launched.
+
+The endpoint for the Corona OMA Browser is `corona.omabrowser.org/api` and can bused in PyOMADB by importing `CoronaClient` instead of `Client`.
+
+```
+from omadb import CoronaClient
+c = CoronaClient()       # Connects to Corona OMA endpoint
+
+prot_id = 'R1AB_SARS2'   # Severe acute respiratory syndrome coronavirus 2
+r = c.proteins[prot_id]  # Can also be called as c.proteins.info(prot_id)
+```
+
+This is then a Python dictionary containing information about this entry. Some information is lazily loaded, for example:
+
+```
+orth = r.orthologs  # Will lazily load in the background.
+```
 
 ## License
 

@@ -466,6 +466,30 @@ class Client(object):
         return e
 
 
+class CoronaClient(Client):
+    '''
+    Client for the Corona OMA browser REST API.
+
+    Initialisation example::
+
+        from omadb import CoronaClient
+        c = CoronaClient()
+
+    :raises ClientException: for 400, 404, 500 errors.
+    :raises ClientTimeout: for timeout when interacting with REST endpoint.
+    '''
+    def __init__(self, endpoint='corona.omabrowser.org/api', persistent_cached=False,
+                 persistent_cache_path=None):
+        '''
+        :param str endpoint: OMA REST API endpoint (default corona.omabrowser.org/api)
+        :param bool persistent_cached: whether to cache queries on disk in SQLite DB.
+        :param persistent_cache_path: location for persistent cache, optional
+        :type persistent_cache_path: str or None
+        '''
+        super().__init__(endpoint=endpoint,
+                         persistent_cached=persistent_cached,
+                         persistent_cache_path=persistent_cache_path)
+
 
 class ClientFunctionSet(object):
     def __init__(self, client):
