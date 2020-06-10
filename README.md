@@ -6,6 +6,9 @@ Documentation is available <a href="http://dessimozlab.github.io/pyomadb/build/h
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/DessimozLab/pyomadb/master?filepath=examples%2Fpyomadb-examples.ipynb)
 
+<b>New (version 2.1.0)</b> -- in order to facilitate the functional and evolutionary aspects of coronaviruses, the new <a href="https://corona.omabrowser.org/">Corona OMA Browser</a> has been launched. Please see the [Corona-OMA Example](#corona-oma-example) for more information.
+
+
 ## Citation
 If you use our package in your work, please consider citing:
 
