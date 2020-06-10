@@ -59,7 +59,7 @@ For further examples that correspond to the `R` versions given in the paper, see
 
 In order to facilitate the functional and evolutionary aspects of coronaviruses, the new <a href="https://corona.omabrowser.org/">Corona OMA Browser</a> has been launched.
 
-The endpoint for the Corona OMA Browser is `corona.omabrowser.org/api` and can bused in PyOMADB by importing `CoronaClient` instead of `Client`.
+The endpoint for the Corona OMA Browser is `corona.omabrowser.org/api` and can be used in PyOMADB by importing `CoronaClient` instead of `Client`.
 
 ```
 from omadb import CoronaClient
