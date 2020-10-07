@@ -116,7 +116,7 @@ class ClientResponse(AttrDict):
             self.__dictionary__[k] = ClientRequest(self.client, v)
 
         elif isinstance(v, list):
-            if all(x.startswith(self.client.endpoint) for x in v):
+            if all(isinstance(x, str) and x.startswith(self.client.endpoint) for x in v):
                 self.__dictionary__[k] = ClientRequestList(self.client, v)
 
     def as_dataframe(self, k):
