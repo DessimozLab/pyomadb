@@ -115,6 +115,10 @@ class ClientResponse(AttrDict):
         if isinstance(v, str) and v.startswith(self.client.endpoint):
             self.__dictionary__[k] = ClientRequest(self.client, v)
 
+        elif isinstance(v, list):
+            if all(x.startswith(self.client.endpoint) for x in v):
+                self.__dictionary__[k] = ClientRequestList(self.client, v)
+
     def as_dataframe(self, k):
         '''
         Get a dataframe for the list stored in a particular key / attribute.
@@ -160,13 +164,13 @@ class ClientPagedResponse(object):
                     disable=(len(self.progress_desc) == 0))
 
         yield from self._yield_elts(lambda e: ClientResponse(e,
-                                                             client=self.client), 
+                                                             client=self.client),
                                     x, pbar)
 
         while 'next' in r.links:
             r = self.client._request(uri=r.links['next']['url'], raw=True)
             yield from self._yield_elts(lambda e: ClientResponse(e,
-                                                                 client=self.client), 
+                                                                 client=self.client),
                                         json.loads(r.content), pbar)
         pbar.close()
 
@@ -223,6 +227,19 @@ class ClientRequest(object):
     def __repr__(self):
         return '<API Request {}>'.format(self.uri[len(self.client.endpoint):])
 
+
+class ClientRequestList(ClientRequest):
+    def __init__(self, client, uris):
+        self.client = client
+        self.uris = uris
+
+    def __call__(self):
+        return list(map(
+            lambda x: self.client._request(uri=x),
+            self.uris))
+
+    def __repr__(self):
+       return '<API Multiple Request>'
 
 class ClientException(Exception):
     pass
@@ -523,7 +540,7 @@ class Genomes(ClientFunctionSet):
         return self.genome(genome_id)
 
     def __iter__(self):
-        '''Iterate over all genomes.''' 
+        '''Iterate over all genomes.'''
         yield from self.genomes.items()
 
     @property
@@ -631,11 +648,11 @@ class HOGs(ClientFunctionSet):
         Retrieve list of HOGs at a particular level
 
         :param str level: level of interest
-       
+
         :return: all hogs at a particular level
         :rtype: ClientPagedResponse
         '''
-        return self._client._request(action='hog', 
+        return self._client._request(action='hog',
                                      params={'level': level},
                                      paginated=True)
 
@@ -719,7 +736,7 @@ class HOGs(ClientFunctionSet):
         '''
         Use the PyHAM package to analyse a particular hierarchical orthologous
         group.
-        
+
         :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
         :type hog_id: str or int
 
@@ -732,7 +749,7 @@ class HOGs(ClientFunctionSet):
         '''
         Use the PyHAM package to analyse a particular hierarchical orthologous
         group.
-        
+
         :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins
         :type hog_id: str or int
 
@@ -890,7 +907,7 @@ class Entries(ClientFunctionSet):
 
                 if as_goatools:
                     from goatools.go_enrichment import GOEnrichmentStudy
-                    
+
                     goea = GOEnrichmentStudy(z.keys(),
                                              {k: {x.GO_term for x in v}
                                               for (k, v) in z.items()},
@@ -909,7 +926,7 @@ class Entries(ClientFunctionSet):
                                       as_dataframe=as_dataframe)
             if aspect is None:
                 return z
-            
+
             # Translate
             aspects = {'bp': 'biological_process',
                        'cc': 'cellular_component',
@@ -1174,14 +1191,14 @@ class Taxonomy(ClientFunctionSet):
         :param str format: format of the taxonomy (dictionary [default], newick or phyloxml)
         :param bool collapse: whether or not to collapse levels with single child, optional (default yes)
 
-        :return: taxonomy 
+        :return: taxonomy
         :rtype: str
 
         '''
         x = self._client._request(action=['taxonomy', root],
                                   params={'type': format,
                                           'collapse': collapse},
-                                  raw=((format is not None) and 
+                                  raw=((format is not None) and
                                        (format is not 'dictionary')))
 
         if format is None or format is 'dictionary':
@@ -1363,7 +1380,7 @@ class PairwiseRelations(ClientFunctionSet):
     def __call__(self, genome_id1, genome_id2, chr1=None, chr2=None,
                  rel_type=None, progress=False):
         '''
-        List the pairwise relations among two genomes. 
+        List the pairwise relations among two genomes.
 
         If genome_id1 == genome_id2, relations are close paralogues and
         homoeologues. If different, the relations are orthologues.
