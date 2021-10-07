@@ -50,6 +50,7 @@
 <li><a class="reference internal" href="#taxonomy">Taxonomy</a></li>
 <li><a class="reference internal" href="#pairwiserelations">PairwiseRelations</a></li>
 <li><a class="reference internal" href="#externalreferences">ExternalReferences</a></li>
+<li><a class="reference internal" href="#goenrichmentanalysis">GOEnrichmentAnalysis</a></li>
 <li><a class="reference internal" href="#clientresponse">ClientResponse</a></li>
 <li><a class="reference internal" href="#attrdict">AttrDict</a></li>
 <li><a class="reference internal" href="#clientpagedresponse">ClientPagedResponse</a></li>
@@ -1077,6 +1078,32 @@ the chromosome corresponds to the IDs in, for example:</p>
 </dd></dl>
 
 </section>
+<section id="goenrichmentanalysis">
+<h2>GOEnrichmentAnalysis<a class="headerlink" href="#goenrichmentanalysis" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">GOEnrichmentAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">go</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper to GOATOOLs to make it more user-friendly with the API.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis.run_study">
+<span class="sig-name descname"><span class="pre">run_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">foreground</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis.run_study"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis.run_study" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the GOEA study and returns a dataframe of results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>foreground</strong> (<em>list</em>) – unique identifiers for proteins in foreground set</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>enrichment analysis results</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="clientresponse">
 <h2>ClientResponse<a class="headerlink" href="#clientresponse" title="Permalink to this headline"></a></h2>
 <dl class="py class">
@@ -1148,7 +1175,7 @@ yielded in chunks.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018, Alex Warwick Vesztrocy.</p>
+    <p>&#169; Copyright 2018-2021, Alex Warwick Vesztrocy.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

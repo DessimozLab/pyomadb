@@ -110,6 +110,11 @@ ExternalReferences
 
   .. automethod:: __call__
 
+GOEnrichmentAnalysis
+++++++++++++++++++
+.. autoclass:: omadb.OMARestAPI.GOEnrichmentAnalysis
+  :members:
+
 ClientResponse
 ++++++++++++++
 .. autoclass:: omadb.OMARestAPI.ClientResponse

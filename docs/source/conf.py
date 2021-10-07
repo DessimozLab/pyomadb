@@ -20,7 +20,7 @@ import omadb
 # -- Project information -----------------------------------------------------
 
 project = 'PyOMADB'
-copyright = '2018, Alex Warwick Vesztrocy'
+copyright = '2018-2021, Alex Warwick Vesztrocy'
 author = 'Alex Warwick Vesztrocy'
 
 # The short X.Y version
