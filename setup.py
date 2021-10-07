@@ -26,7 +26,7 @@ with open('{:s}/__init__.py'.format(name), 'rt') as fp:
         if line.startswith('__version__'):
             exec(line.rstrip())
 
-requirements = ['property_manager', 'requests_cache', 'tqdm',
+requirements = ['property_manager', 'requests_cache>=0.8.1', 'tqdm',
                 'appdirs', 'requests', 'pandas']
 
 desc = 'Client to the OMA browser, using the REST API.'

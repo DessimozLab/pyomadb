@@ -23,7 +23,7 @@ from functools import lru_cache
 from io import StringIO
 from pprint import pformat
 from property_manager import lazy_property
-from requests_cache.core import CachedSession
+from requests_cache import CachedSession
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from urllib.request import quote as uri_quote
 from tqdm import tqdm
@@ -410,15 +410,19 @@ class Client(object):
                              headers=self.HEADERS,
                              timeout=self.TIMEOUT)
 
-    def _request(self, request_type='get', **kwargs):
+    def _request(self, request_type='get', url=None, **kwargs):
         raw = kwargs.pop('raw', False)
         progress_desc = kwargs.pop('progress_desc', '')
         as_dataframe = kwargs.pop('as_dataframe', False)
 
         # Get URI and params
-        (uri, params) = self._get_request_uri(**kwargs)
-        url = ((self.endpoint + uri) if not uri.startswith(self.endpoint)
-               else uri)
+        if url is None:
+            (uri, params) = self._get_request_uri(**kwargs)
+            url = ((self.endpoint + uri) if not uri.startswith(self.endpoint)
+                   else uri)
+        else:
+            params = {}
+
         try:
             if request_type is 'get':
                 r = self._request_get(url, **params)
@@ -600,7 +604,7 @@ class Genomes(ClientFunctionSet):
         :return: proteins in genome
         :rtype: ClientPagedResponse
         '''
-        desc = 'Retrieving proteins for {}'.format(sp_code) if progress else ''
+        desc = 'Retrieving proteins for {}'.format(genome_id) if progress else ''
         return self._client._request(action=['genome', 'proteins'],
                                      subject=genome_id,
                                      paginated=True,
@@ -619,6 +623,9 @@ class HOGs(ClientFunctionSet):
         c = Client()
         entry = c.hogs['WHEAT00001']
     '''
+
+
+
     def _ensure_hog_id(self, hog_id):
         return 'HOG:{:07d}'.format(hog_id) if isinstance(hog_id, numbers.Number) else hog_id
 
@@ -633,6 +640,16 @@ class HOGs(ClientFunctionSet):
         :rtype: ClientResponse
         '''
         return self.info(hog_id)
+
+    def get_orthoxml(self, hog_id):
+        '''
+        Retrieve OrthoXML (from browser) for a particular HOG.
+
+        :return: OrthoXML
+        :rtype: str
+        '''
+        url = 'https://omabrowser.org/oma/hog/{}/orthoxml/'.format(self._ensure_hog_id(hog_id))
+        return self._client._request(url=url, raw=True).content.decode('ascii')
 
     def list(self):
         '''
@@ -839,10 +856,22 @@ class Entries(ClientFunctionSet):
         if isinstance(entry_id, numbers.Number) or isinstance(entry_id, str):
             return self._client._request(action='protein', subject=entry_id)
         else:
-            return self._client._request(action='protein',
-                                         subject='bulk_retrieve',
-                                         data={'ids': list(entry_id)},
-                                         request_type='post')
+            is_list = isinstance(entry_id, list)
+            entry_ids = list(entry_id)
+            z = self._client._request(action='protein',
+                                      subject='bulk_retrieve',
+                                      data={'ids': entry_ids},
+                                      request_type='post')
+            if not is_list:
+                # set, dictionary keys, etc. anything that list(x) works on
+                return {x.query_id: x.target for x in z}
+            else:
+                # possibly out of order
+                e2i = dict(map(lambda x: (x[1], x[0]), enumerate(entry_ids)))
+                res = [None] * len(entry_ids)
+                for x in z:
+                    res[e2i[x.query_id]] = x.target
+            return res
 
     def domains(self, entry_id):
         '''
@@ -872,7 +901,7 @@ class Entries(ClientFunctionSet):
             return GODag(fp.name)
 
     def gene_ontology(self, entry_id, aspect=None, as_dataframe=None,
-                      as_goatools=None, progress=False, **kwargs):
+                      as_goatools=None, as_goea=None, progress=False, **kwargs):
         '''
         Retrieve any associations to Gene Ontology terms for a protein.
 
@@ -880,14 +909,15 @@ class Entries(ClientFunctionSet):
         :type entry_id: str or int or list
         :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
         :param bool as_dataframe: whether to return as pandas data frame, optional
-        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional
+        :param bool as_goea: whether to return a GOEnrichmentAnalysis object, optional
+        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional (deprecated)
         :param bool progress: whether to show a progress bar during load (default False)
 
         :return: gene ontology associations
         :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy
         '''
         if isinstance(entry_id, list):
-            assert (not (as_goatools and as_dataframe)), 'Cannot load both GOATOOLS and data frame!'
+            assert (not ((as_goea or as_goatools) and as_dataframe)), 'Cannot load both GOATOOLS and data frame!'
 
             if as_dataframe:
                 dfs = []
@@ -905,15 +935,23 @@ class Entries(ClientFunctionSet):
                                    desc='Retrieving GO',
                                    disable=(not progress))}
 
-                if as_goatools:
+                if as_goea:
+                    # new wrapper to goatools to give df as res
+                    methods = kwargs.get('methods', ['fdr_bh'])
+                    return GOEnrichmentAnalysis(z, self._gene_ontology, methods)
+
+                elif as_goatools:
+                    # for backwards compatibility keep this
                     from goatools.go_enrichment import GOEnrichmentStudy
 
+                    methods = kwargs.get('methods', ['fdr_bh'])
                     goea = GOEnrichmentStudy(z.keys(),
                                              {k: {x.GO_term for x in v}
                                               for (k, v) in z.items()},
                                              self._gene_ontology,
-                                             methods=['fdr_bh'])
+                                             methods=methods)
                     return goea
+
                 else:
                     return z
 
@@ -995,6 +1033,31 @@ class Entries(ClientFunctionSet):
                                      subject=entry_id,
                                      params=({'rel_type': rel_type}
                                              if rel_type is not None else None))
+
+    def hog_derived_orthologs(self, entry_id):
+        '''
+        Retrieve list of all orthologs derived from the HOG for a given protein.
+
+        :param entry_id: a unique identifier for a protein
+        :type entry_id: str or int
+
+        :return: list of orthologs
+        :rtype: ClientResponse
+        '''
+        return self.hog_derived_orthologues(entry_id)
+
+    def hog_derived_orthologues(self, entry_id):
+        '''
+        Retrieve list of all orthologues derived from the HOG for a given protein.
+
+        :param entry_id: a unique identifier for a protein
+        :type entry_id: str or int
+
+        :return: list of orthologues
+        :rtype: ClientResponse
+        '''
+        return self._client._request(action=['protein', 'hog_derived_orthologs'],
+                                     subject=entry_id)
 
     def cross_references(self, entry_id, type=None):
         '''
@@ -1420,3 +1483,31 @@ class PairwiseRelations(ClientFunctionSet):
                                      paginated=True,
                                      progress_desc=('Loading pairs'
                                                   if progress else None))
+
+class GOEnrichmentAnalysis(object):
+    '''
+    Wrapper to GOATOOLs to make it more user-friendly with the API.
+    '''
+    def __init__(self, annots, go, methods):
+        from goatools.go_enrichment import GOEnrichmentStudy
+
+        self._goea = GOEnrichmentStudy(annots.keys(),
+                                       {k: {x.GO_term for x in v}
+                                        for (k, v) in annots.items()},
+                                       go,
+                                       methods=methods)
+
+    def run_study(self, foreground):
+        '''
+        Runs the GOEA study and returns a dataframe of results.
+
+        :param foreground: unique identifiers for proteins in foreground set
+        :type foreground: list
+
+        :return: enrichment analysis results
+        :rtype: pd.DataFrame
+        '''
+        res = self._goea.run_study(foreground)
+        return pd.DataFrame.from_records((dict(zip(z.get_prtflds_default(),
+                                                   z.get_field_values(z.get_prtflds_default())))
+                                          for z in res))
