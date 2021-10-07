@@ -1,67 +1,34 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>omadb.OMARestAPI &mdash; PyOMADB 2.1.6 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>omadb.OMARestAPI &mdash; PyOMADB 2.0.0 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
+        <div class="wy-side-nav-search" >
             <a href="../../index.html" class="icon icon-home"> PyOMADB
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                2.0.0
+                2.1.6
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -69,79 +36,33 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"></div>
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">PyOMADB</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>omadb.OMARestAPI</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for omadb.OMARestAPI</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    PyOMADB -- client to the OMA browser, using the REST API.</span>
@@ -163,15 +84,15 @@
 <span class="sd">    You should have received a copy of the GNU Lesser General Public License</span>
 <span class="sd">    along with PyOMADB.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">lru_cache</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
-<span class="kn">from</span> <span class="nn">property_manager</span> <span class="k">import</span> <span class="n">lazy_property</span>
-<span class="kn">from</span> <span class="nn">requests_cache.core</span> <span class="k">import</span> <span class="n">CachedSession</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span><span class="p">,</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">uri_quote</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">property_manager</span> <span class="kn">import</span> <span class="n">lazy_property</span>
+<span class="kn">from</span> <span class="nn">requests_cache</span> <span class="kn">import</span> <span class="n">CachedSession</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">NamedTemporaryFile</span><span class="p">,</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">uri_quote</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">appdirs</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numbers</span>
@@ -184,7 +105,7 @@
 
 
 <div class="viewcode-block" id="AttrDict"><a class="viewcode-back" href="../../index.html#omadb.AttrDict">[docs]</a><span class="k">class</span> <span class="nc">AttrDict</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span> <span class="o">=</span> <span class="n">d</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">get</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">items</span>
@@ -205,19 +126,19 @@
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_setup_extra&#39;</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_setup_extra</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
 
-    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -226,10 +147,10 @@
     <span class="k">def</span> <span class="nf">_recurse_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_undo_attrdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -245,20 +166,24 @@
 
 
 <div class="viewcode-block" id="ClientResponse"><a class="viewcode-back" href="../../index.html#omadb.ClientResponse">[docs]</a><span class="k">class</span> <span class="nc">ClientResponse</span><span class="p">(</span><span class="n">AttrDict</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_is_paginated</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_is_paginated</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_recurse_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">ClientRequest</span><span class="p">)</span> <span class="k">else</span> <span class="n">r</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_setup_extra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">endpoint</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientRequest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__dictionary__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClientRequestList</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -281,7 +206,7 @@
 
 
 <div class="viewcode-block" id="ClientPagedResponse"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse">[docs]</a><span class="k">class</span> <span class="nc">ClientPagedResponse</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">progress_desc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">progress_desc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">progress_desc</span><span class="p">)</span>
@@ -291,7 +216,7 @@
             <span class="k">yield</span> <span class="n">e</span>
             <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ClientPagedResponse.__iter__"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ClientPagedResponse.__iter__"><a class="viewcode-back" href="../../index.html#omadb.ClientPagedResponse.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Iterates over all entries, silently lazily loading the next page when</span>
 <span class="sd">        required.</span>
@@ -305,13 +230,13 @@
                     <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_desc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span>
 
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yield_elts</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>
-                                                             <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span> 
+                                                             <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span>
                                     <span class="n">x</span><span class="p">,</span> <span class="n">pbar</span><span class="p">)</span>
 
         <span class="k">while</span> <span class="s1">&#39;next&#39;</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">links</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">links</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_yield_elts</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">ClientResponse</span><span class="p">(</span><span class="n">e</span><span class="p">,</span>
-                                                                 <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span> 
+                                                                 <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">),</span>
                                         <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="n">pbar</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -355,19 +280,32 @@
 
 
 <span class="k">class</span> <span class="nc">ClientRequest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;API Request </span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">endpoint</span><span class="p">):])</span>
 
+
+<span class="k">class</span> <span class="nc">ClientRequestList</span><span class="p">(</span><span class="n">ClientRequest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">uris</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uris</span> <span class="o">=</span> <span class="n">uris</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">x</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uris</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="k">return</span> <span class="s1">&#39;&lt;API Multiple Request&gt;&#39;</span>
 
 <span class="k">class</span> <span class="nc">ClientException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
@@ -399,7 +337,7 @@
     <span class="n">PER_PAGE</span> <span class="o">=</span> <span class="mi">10000</span>
     <span class="n">RAMCACHE_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
 
-<div class="viewcode-block" id="Client.__init__"><a class="viewcode-back" href="../../index.html#omadb.Client.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s1">&#39;omabrowser.org/api&#39;</span><span class="p">,</span> <span class="n">persistent_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="Client.__init__"><a class="viewcode-back" href="../../index.html#omadb.Client.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s1">&#39;omabrowser.org/api&#39;</span><span class="p">,</span> <span class="n">persistent_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">persistent_cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        :param str endpoint: OMA REST API endpoint (default omabrowser.org/api)</span>
@@ -410,7 +348,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://&#39;</span> <span class="o">+</span> <span class="n">endpoint</span>
                          <span class="k">if</span> <span class="ow">not</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">)</span>
                          <span class="k">else</span> <span class="n">endpoint</span><span class="p">)</span>
-        <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">client_version</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">client_version</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">[</span><span class="s1">&#39;User-agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;pyomadb/&#39;</span><span class="o">+</span><span class="n">client_version</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">persistent_cached</span> <span class="o">=</span> <span class="n">persistent_cached</span>
@@ -538,15 +476,19 @@
                              <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADERS</span><span class="p">,</span>
                              <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">progress_desc</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;progress_desc&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">as_dataframe</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;as_dataframe&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Get URI and params</span>
-        <span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request_uri</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">+</span> <span class="n">uri</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
-               <span class="k">else</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_request_uri</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">+</span> <span class="n">uri</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+                   <span class="k">else</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">request_type</span> <span class="ow">is</span> <span class="s1">&#39;get&#39;</span><span class="p">:</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
@@ -611,9 +553,33 @@
         <span class="k">return</span> <span class="n">e</span></div>
 
 
+<span class="k">class</span> <span class="nc">CoronaClient</span><span class="p">(</span><span class="n">Client</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Client for the Corona OMA browser REST API.</span>
+
+<span class="sd">    Initialisation example::</span>
+
+<span class="sd">        from omadb import CoronaClient</span>
+<span class="sd">        c = CoronaClient()</span>
+
+<span class="sd">    :raises ClientException: for 400, 404, 500 errors.</span>
+<span class="sd">    :raises ClientTimeout: for timeout when interacting with REST endpoint.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s1">&#39;corona.omabrowser.org/api&#39;</span><span class="p">,</span> <span class="n">persistent_cached</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">persistent_cache_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        :param str endpoint: OMA REST API endpoint (default corona.omabrowser.org/api)</span>
+<span class="sd">        :param bool persistent_cached: whether to cache queries on disk in SQLite DB.</span>
+<span class="sd">        :param persistent_cache_path: location for persistent cache, optional</span>
+<span class="sd">        :type persistent_cache_path: str or None</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
+                         <span class="n">persistent_cached</span><span class="o">=</span><span class="n">persistent_cached</span><span class="p">,</span>
+                         <span class="n">persistent_cache_path</span><span class="o">=</span><span class="n">persistent_cache_path</span><span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">ClientFunctionSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_setup&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
@@ -631,7 +597,7 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        wheat = c.genomes.genome(&#39;WHEAT&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="Genomes.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Genomes.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve information on a genome in OMA.</span>
 
@@ -643,8 +609,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="n">genome_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Genomes.__iter__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Iterate over all genomes.&#39;&#39;&#39;</span> 
+<div class="viewcode-block" id="Genomes.__iter__"><a class="viewcode-back" href="../../index.html#omadb.Genomes.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterate over all genomes.&#39;&#39;&#39;</span>
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
@@ -704,7 +670,7 @@
 <span class="sd">        :return: proteins in genome</span>
 <span class="sd">        :rtype: ClientPagedResponse</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Retrieving proteins for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sp_code</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Retrieving proteins for </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">genome_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;genome&#39;</span><span class="p">,</span> <span class="s1">&#39;proteins&#39;</span><span class="p">],</span>
                                      <span class="n">subject</span><span class="o">=</span><span class="n">genome_id</span><span class="p">,</span>
                                      <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -723,10 +689,13 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        entry = c.hogs[&#39;WHEAT00001&#39;]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
+
+
     <span class="k">def</span> <span class="nf">_ensure_hog_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;HOG:</span><span class="si">{:07d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hog_id</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)</span> <span class="k">else</span> <span class="n">hog_id</span>
 
-<div class="viewcode-block" id="HOGs.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.HOGs.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+<div class="viewcode-block" id="HOGs.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.HOGs.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the detail available for a given HOG.</span>
 
@@ -737,6 +706,16 @@
 <span class="sd">        :rtype: ClientResponse</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">hog_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HOGs.get_orthoxml"><a class="viewcode-back" href="../../index.html#omadb.HOGs.get_orthoxml">[docs]</a>    <span class="k">def</span> <span class="nf">get_orthoxml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hog_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve OrthoXML (from browser) for a particular HOG.</span>
+
+<span class="sd">        :return: OrthoXML</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://omabrowser.org/oma/hog/</span><span class="si">{}</span><span class="s1">/orthoxml/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ensure_hog_id</span><span class="p">(</span><span class="n">hog_id</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="HOGs.list"><a class="viewcode-back" href="../../index.html#omadb.HOGs.list">[docs]</a>    <span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -752,11 +731,11 @@
 <span class="sd">        Retrieve list of HOGs at a particular level</span>
 
 <span class="sd">        :param str level: level of interest</span>
-<span class="sd">       </span>
+
 <span class="sd">        :return: all hogs at a particular level</span>
 <span class="sd">        :rtype: ClientPagedResponse</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span> 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;hog&#39;</span><span class="p">,</span>
                                      <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">level</span><span class="p">},</span>
                                      <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
@@ -840,7 +819,7 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Use the PyHAM package to analyse a particular hierarchical orthologous</span>
 <span class="sd">        group.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
 <span class="sd">        :type hog_id: str or int</span>
 
@@ -853,7 +832,7 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Use the PyHAM package to analyse a particular hierarchical orthologous</span>
 <span class="sd">        group.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param hog_id: unique identifier for a HOG, either HOG ID or one of its member proteins</span>
 <span class="sd">        :type hog_id: str or int</span>
 
@@ -861,7 +840,7 @@
 <span class="sd">        :rtype: pyham.Ham</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">pyham</span> <span class="k">import</span> <span class="n">Ham</span>
+            <span class="kn">from</span> <span class="nn">pyham</span> <span class="kn">import</span> <span class="n">Ham</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;For HOG analysis, the pyham package is &#39;</span>
                               <span class="s1">&#39;required.&#39;</span><span class="p">)</span>
@@ -918,7 +897,7 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        entry = c.entries[&#39;WHEAT00001&#39;]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="Entries.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Entries.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+<div class="viewcode-block" id="Entries.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.Entries.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the information available for a protein entry.</span>
 
@@ -943,10 +922,22 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span>
-                                         <span class="n">subject</span><span class="o">=</span><span class="s1">&#39;bulk_retrieve&#39;</span><span class="p">,</span>
-                                         <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ids&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)},</span>
-                                         <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span></div>
+            <span class="n">is_list</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="n">entry_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+                                      <span class="n">subject</span><span class="o">=</span><span class="s1">&#39;bulk_retrieve&#39;</span><span class="p">,</span>
+                                      <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ids&#39;</span><span class="p">:</span> <span class="n">entry_ids</span><span class="p">},</span>
+                                      <span class="n">request_type</span><span class="o">=</span><span class="s1">&#39;post&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_list</span><span class="p">:</span>
+                <span class="c1"># set, dictionary keys, etc. anything that list(x) works on</span>
+                <span class="k">return</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">query_id</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">target</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">z</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># possibly out of order</span>
+                <span class="n">e2i</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entry_ids</span><span class="p">)))</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry_ids</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">z</span><span class="p">:</span>
+                    <span class="n">res</span><span class="p">[</span><span class="n">e2i</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">query_id</span><span class="p">]]</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">target</span>
+            <span class="k">return</span> <span class="n">res</span></div>
 
 <div class="viewcode-block" id="Entries.domains"><a class="viewcode-back" href="../../index.html#omadb.Entries.domains">[docs]</a>    <span class="k">def</span> <span class="nf">domains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -963,7 +954,7 @@
 
     <span class="nd">@lazy_property</span>
     <span class="k">def</span> <span class="nf">_gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">goatools.obo_parser</span> <span class="k">import</span> <span class="n">GODag</span>
+        <span class="kn">from</span> <span class="nn">goatools.obo_parser</span> <span class="kn">import</span> <span class="n">GODag</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://purl.obolibrary.org/obo/go/go-basic.obo&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
@@ -976,7 +967,7 @@
             <span class="k">return</span> <span class="n">GODag</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Entries.gene_ontology"><a class="viewcode-back" href="../../index.html#omadb.Entries.gene_ontology">[docs]</a>    <span class="k">def</span> <span class="nf">gene_ontology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                      <span class="n">as_goatools</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_goea</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve any associations to Gene Ontology terms for a protein.</span>
 
@@ -984,14 +975,15 @@
 <span class="sd">        :type entry_id: str or int or list</span>
 <span class="sd">        :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)</span>
 <span class="sd">        :param bool as_dataframe: whether to return as pandas data frame, optional</span>
-<span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional</span>
+<span class="sd">        :param bool as_goea: whether to return a GOEnrichmentAnalysis object, optional</span>
+<span class="sd">        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional (deprecated)</span>
 <span class="sd">        :param bool progress: whether to show a progress bar during load (default False)</span>
 
 <span class="sd">        :return: gene ontology associations</span>
 <span class="sd">        :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">as_goatools</span> <span class="ow">and</span> <span class="n">as_dataframe</span><span class="p">)),</span> <span class="s1">&#39;Cannot load both GOATOOLS and data frame!&#39;</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="ow">not</span> <span class="p">((</span><span class="n">as_goea</span> <span class="ow">or</span> <span class="n">as_goatools</span><span class="p">)</span> <span class="ow">and</span> <span class="n">as_dataframe</span><span class="p">)),</span> <span class="s1">&#39;Cannot load both GOATOOLS and data frame!&#39;</span>
 
             <span class="k">if</span> <span class="n">as_dataframe</span><span class="p">:</span>
                 <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1009,15 +1001,23 @@
                                    <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Retrieving GO&#39;</span><span class="p">,</span>
                                    <span class="n">disable</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="n">progress</span><span class="p">))}</span>
 
-                <span class="k">if</span> <span class="n">as_goatools</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">goatools.go_enrichment</span> <span class="k">import</span> <span class="n">GOEnrichmentStudy</span>
-                    
+                <span class="k">if</span> <span class="n">as_goea</span><span class="p">:</span>
+                    <span class="c1"># new wrapper to goatools to give df as res</span>
+                    <span class="n">methods</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;methods&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fdr_bh&#39;</span><span class="p">])</span>
+                    <span class="k">return</span> <span class="n">GOEnrichmentAnalysis</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gene_ontology</span><span class="p">,</span> <span class="n">methods</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">as_goatools</span><span class="p">:</span>
+                    <span class="c1"># for backwards compatibility keep this</span>
+                    <span class="kn">from</span> <span class="nn">goatools.go_enrichment</span> <span class="kn">import</span> <span class="n">GOEnrichmentStudy</span>
+
+                    <span class="n">methods</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;methods&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;fdr_bh&#39;</span><span class="p">])</span>
                     <span class="n">goea</span> <span class="o">=</span> <span class="n">GOEnrichmentStudy</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                                              <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">GO_term</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">}</span>
                                               <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">_gene_ontology</span><span class="p">,</span>
-                                             <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fdr_bh&#39;</span><span class="p">])</span>
+                                             <span class="n">methods</span><span class="o">=</span><span class="n">methods</span><span class="p">)</span>
                     <span class="k">return</span> <span class="n">goea</span>
+
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">z</span>
 
@@ -1030,7 +1030,7 @@
                                       <span class="n">as_dataframe</span><span class="o">=</span><span class="n">as_dataframe</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">aspect</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">z</span>
-            
+
             <span class="c1"># Translate</span>
             <span class="n">aspects</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bp&#39;</span><span class="p">:</span> <span class="s1">&#39;biological_process&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;cc&#39;</span><span class="p">:</span> <span class="s1">&#39;cellular_component&#39;</span><span class="p">,</span>
@@ -1099,6 +1099,31 @@
                                      <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">,</span>
                                      <span class="n">params</span><span class="o">=</span><span class="p">({</span><span class="s1">&#39;rel_type&#39;</span><span class="p">:</span> <span class="n">rel_type</span><span class="p">}</span>
                                              <span class="k">if</span> <span class="n">rel_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Entries.hog_derived_orthologs"><a class="viewcode-back" href="../../index.html#omadb.Entries.hog_derived_orthologs">[docs]</a>    <span class="k">def</span> <span class="nf">hog_derived_orthologs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of all orthologs derived from the HOG for a given protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: list of orthologs</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hog_derived_orthologues</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Entries.hog_derived_orthologues"><a class="viewcode-back" href="../../index.html#omadb.Entries.hog_derived_orthologues">[docs]</a>    <span class="k">def</span> <span class="nf">hog_derived_orthologues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve list of all orthologues derived from the HOG for a given protein.</span>
+
+<span class="sd">        :param entry_id: a unique identifier for a protein</span>
+<span class="sd">        :type entry_id: str or int</span>
+
+<span class="sd">        :return: list of orthologues</span>
+<span class="sd">        :rtype: ClientResponse</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;hog_derived_orthologs&#39;</span><span class="p">],</span>
+                                     <span class="n">subject</span><span class="o">=</span><span class="n">entry_id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Entries.cross_references"><a class="viewcode-back" href="../../index.html#omadb.Entries.cross_references">[docs]</a>    <span class="k">def</span> <span class="nf">cross_references</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -1178,7 +1203,7 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        gos = c.function(&#39;ATCATATCAT&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../index.html#omadb.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Function.__call__"><a class="viewcode-back" href="../../index.html#omadb.Function.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seq</span><span class="p">,</span> <span class="n">as_dataframe</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Annotate a sequence with GO terms based on annotations stored in the</span>
 <span class="sd">        OMA database.</span>
@@ -1206,7 +1231,7 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        og = c.groups[&#39;WHEAT00001&#39;]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="OMAGroups.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
+<div class="viewcode-block" id="OMAGroups.__getitem__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve information available for a given OMA group.</span>
 
@@ -1218,7 +1243,7 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="OMAGroups.__iter__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="OMAGroups.__iter__"><a class="viewcode-back" href="../../index.html#omadb.OMAGroups.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Iterate over all OMA groups in the current release.</span>
 
@@ -1295,14 +1320,14 @@
 <span class="sd">        :param str format: format of the taxonomy (dictionary [default], newick or phyloxml)</span>
 <span class="sd">        :param bool collapse: whether or not to collapse levels with single child, optional (default yes)</span>
 
-<span class="sd">        :return: taxonomy </span>
+<span class="sd">        :return: taxonomy</span>
 <span class="sd">        :rtype: str</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_request</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">],</span>
                                   <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">format</span><span class="p">,</span>
                                           <span class="s1">&#39;collapse&#39;</span><span class="p">:</span> <span class="n">collapse</span><span class="p">},</span>
-                                  <span class="n">raw</span><span class="o">=</span><span class="p">((</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> 
+                                  <span class="n">raw</span><span class="o">=</span><span class="p">((</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
                                        <span class="p">(</span><span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">format</span> <span class="ow">is</span> <span class="s1">&#39;dictionary&#39;</span><span class="p">:</span>
@@ -1455,7 +1480,7 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        xrefs = c.xrefs(&#39;AAA&#39;)</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="ExternalReferences.__call__"><a class="viewcode-back" href="../../index.html#omadb.ExternalReferences.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalReferences.__call__"><a class="viewcode-back" href="../../index.html#omadb.ExternalReferences.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve external references for a particular sequence.</span>
 
@@ -1481,10 +1506,10 @@
 <span class="sd">        c = Client()</span>
 <span class="sd">        arath_wheat_pairs = list(c.pairwise(&#39;ARATH&#39;, &#39;WHEAT&#39;, progress=True))</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-<div class="viewcode-block" id="PairwiseRelations.__call__"><a class="viewcode-back" href="../../index.html#omadb.PairwiseRelations.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id1</span><span class="p">,</span> <span class="n">genome_id2</span><span class="p">,</span> <span class="n">chr1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chr2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="PairwiseRelations.__call__"><a class="viewcode-back" href="../../index.html#omadb.PairwiseRelations.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genome_id1</span><span class="p">,</span> <span class="n">genome_id2</span><span class="p">,</span> <span class="n">chr1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chr2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">rel_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        List the pairwise relations among two genomes. </span>
+<span class="sd">        List the pairwise relations among two genomes.</span>
 
 <span class="sd">        If genome_id1 == genome_id2, relations are close paralogues and</span>
 <span class="sd">        homoeologues. If different, the relations are orthologues.</span>
@@ -1524,50 +1549,57 @@
                                      <span class="n">paginated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                      <span class="n">progress_desc</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;Loading pairs&#39;</span>
                                                   <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span></div></div>
+
+<span class="k">class</span> <span class="nc">GOEnrichmentAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Wrapper to GOATOOLs to make it more user-friendly with the API.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annots</span><span class="p">,</span> <span class="n">go</span><span class="p">,</span> <span class="n">methods</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">goatools.go_enrichment</span> <span class="kn">import</span> <span class="n">GOEnrichmentStudy</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_goea</span> <span class="o">=</span> <span class="n">GOEnrichmentStudy</span><span class="p">(</span><span class="n">annots</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+                                       <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">GO_term</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">}</span>
+                                        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">annots</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+                                       <span class="n">go</span><span class="p">,</span>
+                                       <span class="n">methods</span><span class="o">=</span><span class="n">methods</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run_study</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">foreground</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Runs the GOEA study and returns a dataframe of results.</span>
+
+<span class="sd">        :param foreground: unique identifiers for proteins in foreground set</span>
+<span class="sd">        :type foreground: list</span>
+
+<span class="sd">        :return: enrichment analysis results</span>
+<span class="sd">        :rtype: pd.DataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_goea</span><span class="o">.</span><span class="n">run_study</span><span class="p">(</span><span class="n">foreground</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">((</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">get_prtflds_default</span><span class="p">(),</span>
+                                                   <span class="n">z</span><span class="o">.</span><span class="n">get_field_values</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">get_prtflds_default</span><span class="p">())))</span>
+                                          <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">res</span><span class="p">))</span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2018, Alex Warwick Vesztrocy
-
-    </p>
+    <p>&#169; Copyright 2018, Alex Warwick Vesztrocy.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
