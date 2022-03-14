@@ -624,8 +624,6 @@ class HOGs(ClientFunctionSet):
         entry = c.hogs['WHEAT00001']
     '''
 
-
-
     def _ensure_hog_id(self, hog_id):
         return 'HOG:{:07d}'.format(hog_id) if isinstance(hog_id, numbers.Number) else hog_id
 
@@ -641,14 +639,21 @@ class HOGs(ClientFunctionSet):
         '''
         return self.info(hog_id)
 
-    def get_orthoxml(self, hog_id):
+    def get_orthoxml(self, hog_id, augmented=False):
         '''
         Retrieve OrthoXML (from browser) for a particular HOG.
+
+        :param augmented: whether or not to use the augmented version of the orthoxml, that contains
+                          more information but is not fully according to the spec. Essentially it
+                          also contains orthologGroup nodes that have only one children node.
+        :type augmented: bool
 
         :return: OrthoXML
         :rtype: str
         '''
         url = 'https://omabrowser.org/oma/hog/{}/orthoxml/'.format(self._ensure_hog_id(hog_id))
+        if augmented:
+            url += "augmented/"
         return self._client._request(url=url, raw=True).content.decode('ascii')
 
     def list(self):
