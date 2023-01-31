@@ -424,9 +424,9 @@ class Client(object):
             params = {}
 
         try:
-            if request_type is 'get':
+            if request_type == 'get':
                 r = self._request_get(url, **params)
-            elif request_type is 'post':
+            elif request_type == 'post':
                 data = self._get_request_data(**kwargs)
                 r = self._request_post(url, data)
             else:
@@ -1238,13 +1238,13 @@ class Taxonomy(ClientFunctionSet):
                                           'type': format,
                                           'collapse': collapse},
                                  raw=((format is not None) and
-                                      (format is not 'dictionary')))
+                                      (format != 'dictionary')))
 
-        if format is None or format is 'dictionary':
+        if format is None or format == 'dictionary':
             return x
-        elif format is 'newick':
+        elif format == 'newick':
             return json.loads(x.content)['newick']
-        elif format is 'phyloxml':
+        elif format == 'phyloxml':
             return x.content
         else:
             # This shouldn't really happen (Dec 2018)
@@ -1267,13 +1267,13 @@ class Taxonomy(ClientFunctionSet):
                                   params={'type': format,
                                           'collapse': collapse},
                                   raw=((format is not None) and
-                                       (format is not 'dictionary')))
+                                       (format != 'dictionary')))
 
-        if format is None or format is 'dictionary':
+        if format is None or format == 'dictionary':
             return x
-        elif format is 'newick':
+        elif format == 'newick':
             return json.loads(x.content)['newick']
-        elif format is 'phyloxml':
+        elif format == 'phyloxml':
             return x.content
         else:
             # This shouldn't really happen (Dec 2018)
