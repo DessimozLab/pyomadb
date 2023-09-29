@@ -27,7 +27,7 @@ with open('{:s}/__init__.py'.format(name), 'rt') as fp:
             exec(line.rstrip())
 
 requirements = ['property_manager', 'requests_cache>=0.8.1', 'tqdm',
-                'appdirs', 'requests', 'pandas']
+                'appdirs', 'requests', 'pandas', 'networkx']
 
 desc = 'Client to the OMA browser, using the REST API.'
 

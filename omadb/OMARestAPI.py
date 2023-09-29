@@ -18,7 +18,7 @@
     You should have received a copy of the GNU Lesser General Public License
     along with PyOMADB.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from collections import defaultdict
+from collections import defaultdict, deque
 from functools import lru_cache
 from io import StringIO
 from pprint import pformat
@@ -28,6 +28,7 @@ from tempfile import NamedTemporaryFile, TemporaryDirectory
 from urllib.request import quote as uri_quote
 from tqdm import tqdm
 import appdirs
+import itertools
 import json
 import numbers
 import os
@@ -512,6 +513,35 @@ class CoronaClient(Client):
                          persistent_cache_path=persistent_cache_path)
 
 
+class OMAStageClient(Client):
+    '''
+    Client for the OMA browser REST API on the oma-stage server.
+
+    Initialisation example::
+
+        from omadb import OMAStageClient
+        c = OMAStageClient()
+
+    :raises ClientException: for 400, 404, 500 errors.
+    :raises ClientTimeout: for timeout when interacting with REST endpoint.
+    '''
+    def __init__(self, endpoint='oma-stage.vital-it.ch/api', persistent_cached=False,
+                 persistent_cache_path=None):
+        '''
+        :param str endpoint: OMA REST API endpoint (default oma-stage.vital-it.ch/api)
+        :param bool persistent_cached: whether to cache queries on disk in SQLite DB.
+        :param persistent_cache_path: location for persistent cache, optional
+        :type persistent_cache_path: str or None
+        '''
+        super().__init__(endpoint=endpoint,
+                         persistent_cached=persistent_cached,
+                         persistent_cache_path=persistent_cache_path)
+
+    def _setup(self):
+        super()._setup()
+        self.synteny = Synteny(self)
+
+
 class ClientFunctionSet(object):
     def __init__(self, client):
         self._client = client
@@ -822,6 +852,73 @@ class HOGs(ClientFunctionSet):
         with open(fn, 'wt') as fp:
             fp.write(iham.HTML)
         print('{}'.format(fn))
+
+    #def gene_ontology(self, hog_id, level=None, aspect=None, as_dataframe=None,
+    #                  progress=False, **kwargs):
+    #    '''
+    #    Retrieve any associations to Gene Ontology terms for a protein.
+
+    #    :param hog_id: a unique identifier for a hog_group - either its hog id starting with "HOG:" or one of its member proteins in which case the specific HOG ID of that protein is used. (Example: HOG:0001221.1a, P12345)
+    #    :type hog_id: str or list
+    #    :param level: taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)
+    #    :type level: str or list
+    #    :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
+    #    :param bool as_dataframe: whether to return as pandas data frame, optional
+    #    :param bool progress: whether to show a progress bar during load (default False)
+
+    #    :return: gene ontology associations
+    #    :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy
+    #    '''
+    #    if not isinstance(hog_id, list):
+    #        # get individual
+    #        z = self._client._request(action=['hog', 'gene_ontology'],
+    #                                  subject=hog_id,
+    #                                  params={'level': level},
+    #                                  as_dataframe=as_dataframe)
+    #        if aspect is None or len(z) == 0:
+    #            return z
+
+    #        # Translate
+    #        aspects = {'bp': 'biological_process',
+    #                   'cc': 'cellular_component',
+    #                   'mf': 'molecular_function'}
+    #        valid_aspects = set(aspects.values())
+    #        aspect = aspects.get(aspect.lower(), aspect)
+
+    #        assert (aspect in valid_aspects), 'Unknown aspect: {}'.format(aspect)
+    #        if as_dataframe:
+    #            return z[z.aspect == aspect]
+    #        else:
+    #            return list(filter(lambda x: x.aspect == aspect, z))
+    #    else:
+    #        # get multiple
+    #        if not isinstance(level, list):
+    #            level = itertools.repeat(level, len(hog_id))
+    #        else:
+    #            assert (len(hog_id) == len(level)), 'HOG IDs and level must be same length if given as list'
+    #        
+    #        # now load multiple
+    #        if as_dataframe:
+    #            dfs = []
+    #            for x in tqdm(zip(hog_id, level), desc='Retrieving GO',
+    #                          disable=(not progress)):
+    #                df = self.gene_ontology(hog_id=x[0],
+    #                                        level=x[1],
+    #                                        aspect=aspect,
+    #                                        as_dataframe=True)
+    #                df['hog_id'] = x[0]
+    #                df['level'] = x[1]
+    #                df = df.set_index(['hog_id', 'level'])
+    #                dfs.append(df)
+
+    #            return pd.concat(dfs)
+    #        else:
+    #            return {x: self.gene_ontology(hog_id=x[0],
+    #                                          level=x[1],
+    #                                          aspect=aspect)
+    #                    for x in tqdm(zip(hog_id, level),
+    #                                  desc='Retrieving GO',
+    #                                  disable=(not progress))}
 
 
 class Entries(ClientFunctionSet):
@@ -1516,3 +1613,167 @@ class GOEnrichmentAnalysis(object):
         return pd.DataFrame.from_records((dict(zip(z.get_prtflds_default(),
                                                    z.get_field_values(z.get_prtflds_default())))
                                           for z in res))
+
+
+class Synteny(ClientFunctionSet):
+    '''
+    API functionality for loading synteny data.
+
+    Access indirectly, via the client.
+
+    Example::
+
+        from omadb import Client
+        c = Client()
+        xrefs = c.synteny.xrefs('AAA')
+    '''
+    EVIDENCE_TYPES = {'linearized', 'parsimonious', 'any'}
+
+    def _parse_graph(self, z):
+        import networkx as nx
+
+        if len(z.nodes) > 1:
+            # all nodes should be connected when we have more than 1 node in the list
+            G = nx.from_pandas_edgelist(
+                    pd.DataFrame(dict(x) for x in z.links),
+                    source='source',
+                    target='target',
+                    edge_attr=['weight', 'evidence']
+                    )
+        else:
+            # add a single node graph
+            G = nx.Graph()
+            G.add_node(z.nodes[0].id)
+
+        attributes = set(z.nodes[0].keys()) - {'id'}
+        for k in attributes:
+            nx.set_node_attributes(G, values={x['id']: x[k] for x in z.nodes}, name=k)
+
+        # add ability to lazy call for information about the hog
+        nx.set_node_attributes(
+                G,
+                values={x['id']:
+                    ClientRequest(
+                        self._client, 
+                        (
+                            self._client.endpoint + 
+                            self._client._get_request_uri(action='hog', subject=x['id'])[0])
+                        )
+                    for x in z.nodes
+                    },
+                name='info'
+                )
+
+        return G
+
+    def at_level(self, level, evidence='linearized', break_circular_contigs=True):
+        '''
+        Retrieve list of HOGs at a particular level
+
+        :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
+        :type level: str or int
+        :param str evidence: evidence value for the ancestral synteny graph, used for filtering. ('linearized', 'parsimonious', 'any'). (default 'linearized')
+        :param bool break_circular_contigs: whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)
+
+        :return: networkx graph of synteny
+        :rtype: ClientResponse
+        '''
+        assert evidence in self.EVIDENCE_TYPES, 'Evidence must be one of: {}'.format(', '.join(self.EVIDENCE_TYPES))
+
+        z = self._client._request(action='synteny',
+                                  params={'level': level,
+                                          'evidence': evidence,
+                                          'break_circular_contigs': break_circular_contigs})
+        # return a composition of all contigs
+        import networkx as nx
+        return nx.compose_all(list(map(self._parse_graph, z)))
+
+    def neighborhood(self, id, level, evidence='linearized', context=2, break_circular_contigs=True):
+        '''
+        Retrieve neighborhood around a HOG or protein at a particular level. 
+
+        :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
+        :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
+        :type level: str or int
+        :param str evidence: evidence value for the ancestral synteny graph, used for filtering. ('linearized', 'parsimonious', 'any'). (default 'linearized')
+        :param int context: size of the graph around the query HOG, in terms of number of edges. (default 2)
+        :param bool break_circular_contigs: whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)
+
+        :return: networkx graph of synteny
+        :rtype: ClientResponse
+        '''
+        return self.neighbourhood(id, level, evidence, context, break_circular_contigs)
+
+    def neighbourhood(self, id, level, evidence='linearized', context=2, break_circular_contigs=True):
+        '''
+        Retrieve neighbourhood around a HOG or protein at a particular level. 
+
+        :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
+        :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
+        :type level: str or int
+        :param str evidence: evidence value for the ancestral synteny graph, used for filtering. ('linearized', 'parsimonious', 'any'). (default 'linearized')
+        :param int context: size of the graph around the query HOG, in terms of number of edges. (default 2)
+        :param bool break_circular_contigs: whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)
+
+        :return: networkx graph of synteny
+        :rtype: ClientResponse
+        '''
+        assert evidence in self.EVIDENCE_TYPES, 'Evidence must be one of: {}'.format(', '.join(self.EVIDENCE_TYPES))
+
+        z = self._client._request(action='synteny',
+                                  subject=id,
+                                  params={'level': level,
+                                          'evidence': evidence,
+                                          'context': context,
+                                          'break_circular_contigs': break_circular_contigs})
+        
+        import networkx as nx
+        return self._parse_graph(z)
+
+    def window(self, id, level, n=2):
+        '''
+        Retrieve window around a HOG or protein at a particular level. 
+
+        :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
+        :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
+        :type level: str or int
+        :param int n: size of the window +-n around the query HOG. (default 2)
+
+        :return: list of HOGs
+        :rtype: ClientResponse
+        '''
+        G = self.neighbourhood(id, level, context=n)
+
+        hog_order = deque([id])
+
+        # get the direct neighbours
+        direct_neighbours = list(G.adj[id].keys())
+        if len(direct_neighbours) == 2:
+            (before, after) = direct_neighbours
+        elif len(direct_neighbours) == 1:
+            before = None
+            after = direct_neighbours[0]
+        else:
+            before = after = None
+        before1 = after1 = id
+
+        seen = {id}
+
+        i = 0
+        while i < n:
+            # find next
+            if before is not None:
+                hog_order.appendleft(before)
+                # find next
+                before2 = set(G.adj[before].keys()) - {before1}
+                before1 = before
+                before = before2.pop() if len(before2) > 0 else None
+            if after is not None:
+                hog_order.append(after)
+                # find next
+                after2 = set(G.adj[after].keys()) - {after1}
+                after1 = after
+                after = after2.pop() if len(after2) > 0 else None
+            i += 1
+
+        return list(map(self._client.hogs.__getitem__, hog_order))
