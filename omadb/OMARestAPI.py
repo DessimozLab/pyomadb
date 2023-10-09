@@ -30,6 +30,7 @@ from tqdm import tqdm
 import appdirs
 import itertools
 import json
+import logging
 import numbers
 import os
 import pandas as pd
@@ -37,6 +38,14 @@ import random
 import requests
 import shutil
 import warnings
+
+
+logging.basicConfig(format="%(levelname)s: %(message)s")
+LOG = logging.getLogger(__name__)
+
+
+def set_log_level(x):
+    LOG.setLevel(getattr(logging, x.upper()))
 
 
 class AttrDict(object):
@@ -400,12 +409,14 @@ class Client(object):
     @lru_cache(RAMCACHE_SIZE)
     def _request_get(self, url, **params):
         get = getattr(self, 'session', requests).get
+        LOG.debug(f'Calling GET {url}')
         return get(url,
                    headers=self.HEADERS,
                    params=params,
                    timeout=self.TIMEOUT)
 
     def _request_post(self, url, data):
+        LOG.debug(f'Calling POST {url}')
         return requests.post(url,
                              data=data,
                              headers=self.HEADERS,
@@ -695,18 +706,49 @@ class HOGs(ClientFunctionSet):
         '''
         return self.at_level(level=None)
 
-    def at_level(self, level):
+    def at_level(self, level, compare=None, as_dataframe=None):
         '''
         Retrieve list of HOGs at a particular level
 
         :param str level: level of interest
+        :param compare: if set to None, or False, returns all HOGs defined at a particular level. If
+        set to a parental taxonomic level, all hogs will be annotated with evolutionary events that
+        occurred between the two points in time. If set to True, will compare with the direct
+        parent (default None)
+        :type compare: None or bool or str
+        :param bool as_dataframe: whether to return as pandas data frame, optional
 
         :return: all hogs at a particular level
         :rtype: ClientPagedResponse
         '''
-        return self._client._request(action='hog',
-                                     params={'level': level},
-                                     paginated=True)
+        if compare is None or not compare:
+            return self._client._request(action='hog',
+                                         params={'level': level},
+                                         paginated=True)
+        else:
+            if not isinstance(compare, str):
+                assert compare == True, 'Do not recognise {} level'.format(compare)
+                # find the parental level
+                t = self._client.taxonomy.dendropy_tree()
+                n = t.find_node_with_taxon_label(level)
+                if n is None:
+                    # possibly leaf node, attempt to translate to code
+                    n = t.find_node_with_taxon_label(self._client.genomes[level].code)
+
+                if n is not None:
+                    # go up tree until there are two children
+                    p = n.parent_node
+                    while len(p.child_nodes()) < 2:
+                        p = p.parent_node
+                    compare = p.taxon.label
+                else:
+                    raise ValueError("Unknown level {}".format(compare))
+
+        z = self._client._request(action='hog',
+                                  params={'level': level,
+                                          'compare_with': compare},
+                                  paginated=True)
+        return z.as_dataframe() if as_dataframe else z
 
     def info(self, hog_id):
         '''
@@ -896,7 +938,7 @@ class HOGs(ClientFunctionSet):
     #            level = itertools.repeat(level, len(hog_id))
     #        else:
     #            assert (len(hog_id) == len(level)), 'HOG IDs and level must be same length if given as list'
-    #        
+    #
     #        # now load multiple
     #        if as_dataframe:
     #            dfs = []
@@ -1654,9 +1696,9 @@ class Synteny(ClientFunctionSet):
                 G,
                 values={x['id']:
                     ClientRequest(
-                        self._client, 
+                        self._client,
                         (
-                            self._client.endpoint + 
+                            self._client.endpoint +
                             self._client._get_request_uri(action='hog', subject=x['id'])[0])
                         )
                     for x in z.nodes
@@ -1690,7 +1732,7 @@ class Synteny(ClientFunctionSet):
 
     def neighborhood(self, id, level, evidence='linearized', context=2, break_circular_contigs=True):
         '''
-        Retrieve neighborhood around a HOG or protein at a particular level. 
+        Retrieve neighborhood around a HOG or protein at a particular level.
 
         :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
         :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
@@ -1706,7 +1748,7 @@ class Synteny(ClientFunctionSet):
 
     def neighbourhood(self, id, level, evidence='linearized', context=2, break_circular_contigs=True):
         '''
-        Retrieve neighbourhood around a HOG or protein at a particular level. 
+        Retrieve neighbourhood around a HOG or protein at a particular level.
 
         :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
         :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.
@@ -1726,13 +1768,13 @@ class Synteny(ClientFunctionSet):
                                           'evidence': evidence,
                                           'context': context,
                                           'break_circular_contigs': break_circular_contigs})
-        
+
         import networkx as nx
         return self._parse_graph(z)
 
     def window(self, id, level, n=2):
         '''
-        Retrieve window around a HOG or protein at a particular level. 
+        Retrieve window around a HOG or protein at a particular level.
 
         :param str id: unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)
         :param level: taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.

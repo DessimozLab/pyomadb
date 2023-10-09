@@ -21,4 +21,4 @@
 from .OMARestAPI import Client, CoronaClient, OMAStageClient
 
 
-__version__ = '2.1.9'
+__version__ = '2.1.10'
