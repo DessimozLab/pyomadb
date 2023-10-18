@@ -334,6 +334,7 @@ class Client(object):
         self.function = Function(self)
         self.taxonomy = Taxonomy(self)
         self.pairwise = PairwiseRelations(self)
+        self.synteny = Synteny(self)
         self.xrefs = self.external_references = ExternalReferences(self)
 
     @lazy_property
@@ -549,8 +550,9 @@ class OMAStageClient(Client):
                          persistent_cache_path=persistent_cache_path)
 
     def _setup(self):
+        # for adding additional functionality that is only on the oma-stage server
+        # e.g., previously was used to add synteny api calls
         super()._setup()
-        self.synteny = Synteny(self)
 
 
 class ClientFunctionSet(object):
