@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PyOMADB &mdash; PyOMADB 2.1.6 documentation</title>
+  <title>PyOMADB &mdash; PyOMADB 2.2.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -25,14 +24,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> PyOMADB
+
+          
+          
+          <a href="#" class="icon icon-home">
+            PyOMADB
           </a>
               <div class="version">
-                2.1.6
+                2.2.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -50,6 +53,7 @@
 <li><a class="reference internal" href="#taxonomy">Taxonomy</a></li>
 <li><a class="reference internal" href="#pairwiserelations">PairwiseRelations</a></li>
 <li><a class="reference internal" href="#externalreferences">ExternalReferences</a></li>
+<li><a class="reference internal" href="#synteny">Synteny</a></li>
 <li><a class="reference internal" href="#goenrichmentanalysis">GOEnrichmentAnalysis</a></li>
 <li><a class="reference internal" href="#clientresponse">ClientResponse</a></li>
 <li><a class="reference internal" href="#attrdict">AttrDict</a></li>
@@ -72,8 +76,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>PyOMADB</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">PyOMADB</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -83,14 +87,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyomadb">
+  <div class="section" id="pyomadb">
 <h1>PyOMADB<a class="headerlink" href="#pyomadb" title="Permalink to this headline"></a></h1>
 <p>PyOMADB is intended as a user-friendly Python wrapper around the <a class="reference external" href="https://omabrowser.org/api">OMA REST API</a>.</p>
-<section id="client">
+<div class="section" id="client">
 <h2>Client<a class="headerlink" href="#client" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.Client">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'omabrowser.org/api'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cached</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.Client" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'omabrowser.org/api'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cached</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.Client" title="Permalink to this definition"></a></dt>
 <dd><p>Client for the OMA browser REST API.</p>
 <p>Initialisation example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">omadb</span> <span class="kn">import</span> <span class="n">Client</span>
@@ -179,6 +183,12 @@
 <dd></dd></dl>
 
 <p>Synonym of <cite>xrefs</cite>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="omadb.Client.synteny">
+<span class="sig-name descname"><span class="pre">synteny</span></span><a class="headerlink" href="#omadb.Client.synteny" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<p>Instance of <a class="reference internal" href="#omadb.OMARestAPI.Synteny" title="omadb.OMARestAPI.Synteny"><code class="xref py py-class docutils literal notranslate"><span class="pre">omadb.OMARestAPI.Synteny</span></code></a>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.Client.clear_cache">
 <span class="sig-name descname"><span class="pre">clear_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Client.clear_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.Client.clear_cache" title="Permalink to this definition"></a></dt>
@@ -187,12 +197,12 @@
 
 </dd></dl>
 
-</section>
-<section id="genomes">
+</div>
+<div class="section" id="genomes">
 <h2>Genomes<a class="headerlink" href="#genomes" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Genomes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Genomes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for genome information.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -258,7 +268,7 @@ frame.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes.genomes">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">genomes</span></span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.genomes" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">genomes</span></span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.genomes" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve information on all genomes in OMA.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -276,7 +286,7 @@ frame.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes.list">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">list</span></span><a class="headerlink" href="#omadb.OMARestAPI.Genomes.list" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list</span></span><a class="headerlink" href="#omadb.OMARestAPI.Genomes.list" title="Permalink to this definition"></a></dt>
 <dd><p>Synonym for <cite>genomes</cite>. Retrieve information on all genomes in OMA.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -310,12 +320,12 @@ frame.</p>
 
 </dd></dl>
 
-</section>
-<section id="entries">
+</div>
+<div class="section" id="entries">
 <h2>Entries<a class="headerlink" href="#entries" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Entries">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for protein entries.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -570,12 +580,12 @@ frame.</p>
 
 </dd></dl>
 
-</section>
-<section id="hogs">
+</div>
+<div class="section" id="hogs">
 <h2>HOGs<a class="headerlink" href="#hogs" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.HOGs">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">HOGs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">HOGs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for HOG information.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -639,17 +649,27 @@ group.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.HOGs.at_level">
-<span class="sig-name descname"><span class="pre">at_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.at_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.at_level" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">at_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.at_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.at_level" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve list of HOGs at a particular level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>level</strong> (<em>str</em>) – level of interest</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> (<em>str</em>) – level of interest</p></li>
+<li><p><strong>compare</strong> – if set to None, or False, returns all HOGs defined at a particular level. If</p></li>
+</ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>all hogs at a particular level</p>
+</dl>
+<p>set to a parental taxonomic level, all hogs will be annotated with evolutionary events that
+occurred between the two points in time. If set to True, will compare with the direct
+parent (default None)
+:type compare: None or bool or str
+:param bool as_dataframe: whether to return as pandas data frame, optional</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>all hogs at a particular level</p>
 </dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientPagedResponse" title="omadb.OMARestAPI.ClientPagedResponse">ClientPagedResponse</a></p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientPagedResponse" title="omadb.OMARestAPI.ClientPagedResponse">ClientPagedResponse</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -676,14 +696,19 @@ group.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.HOGs.get_orthoxml">
-<span class="sig-name descname"><span class="pre">get_orthoxml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hog_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.get_orthoxml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.get_orthoxml" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_orthoxml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hog_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmented</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.get_orthoxml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.get_orthoxml" title="Permalink to this definition"></a></dt>
 <dd><p>Retrieve OrthoXML (from browser) for a particular HOG.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>OrthoXML</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>augmented</strong> (<em>bool</em>) – whether or not to use the augmented version of the orthoxml, that contains
+more information but is not fully according to the spec. Essentially it
+also contains orthologGroup nodes that have only one children node.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>OrthoXML</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -774,12 +799,12 @@ group.</p>
 
 </dd></dl>
 
-</section>
-<section id="omagroups">
+</div>
+<div class="section" id="omagroups">
 <h2>OMAGroups<a class="headerlink" href="#omagroups" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.OMAGroups">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">OMAGroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#OMAGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.OMAGroups" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">OMAGroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#OMAGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.OMAGroups" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for retrieving information on OMA groups.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -856,12 +881,12 @@ group.</p>
 
 </dd></dl>
 
-</section>
-<section id="function">
+</div>
+<div class="section" id="function">
 <h2>Function<a class="headerlink" href="#function" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Function">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Function" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Function" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for retrieving functional annotations for sequences.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -893,12 +918,12 @@ OMA database.</p>
 
 </dd></dl>
 
-</section>
-<section id="taxonomy">
+</div>
+<div class="section" id="taxonomy">
 <h2>Taxonomy<a class="headerlink" href="#taxonomy" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Taxonomy">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Taxonomy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Taxonomy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy" title="Permalink to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Taxonomy.dendropy_tree">
 <span class="sig-name descname"><span class="pre">dendropy_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">members</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy.dendropy_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy.dendropy_tree" title="Permalink to this definition"></a></dt>
@@ -985,12 +1010,12 @@ OMA database.</p>
 
 </dd></dl>
 
-</section>
-<section id="pairwiserelations">
+</div>
+<div class="section" id="pairwiserelations">
 <h2>PairwiseRelations<a class="headerlink" href="#pairwiserelations" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.PairwiseRelations">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">PairwiseRelations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#PairwiseRelations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.PairwiseRelations" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">PairwiseRelations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#PairwiseRelations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.PairwiseRelations" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for pairwise relations..</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -1041,12 +1066,12 @@ the chromosome corresponds to the IDs in, for example:</p>
 
 </dd></dl>
 
-</section>
-<section id="externalreferences">
+</div>
+<div class="section" id="externalreferences">
 <h2>ExternalReferences<a class="headerlink" href="#externalreferences" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ExternalReferences">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ExternalReferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ExternalReferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ExternalReferences" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ExternalReferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ExternalReferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ExternalReferences" title="Permalink to this definition"></a></dt>
 <dd><p>API functionality for external references from a query sequence.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
@@ -1077,12 +1102,116 @@ the chromosome corresponds to the IDs in, for example:</p>
 
 </dd></dl>
 
-</section>
-<section id="goenrichmentanalysis">
+</div>
+<div class="section" id="synteny">
+<h2>Synteny<a class="headerlink" href="#synteny" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Synteny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny" title="Permalink to this definition"></a></dt>
+<dd><p>API functionality for loading synteny data.</p>
+<p>Access indirectly, via the client.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">omadb</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+<span class="n">xrefs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">synteny</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="s1">&#39;AAA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny.at_level">
+<span class="sig-name descname"><span class="pre">at_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linearized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_circular_contigs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny.at_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny.at_level" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve list of HOGs at a particular level</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> (<em>str</em><em> or </em><em>int</em>) – taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.</p></li>
+<li><p><strong>evidence</strong> (<em>str</em>) – evidence value for the ancestral synteny graph, used for filtering. (‘linearized’, ‘parsimonious’, ‘any’). (default ‘linearized’)</p></li>
+<li><p><strong>break_circular_contigs</strong> (<em>bool</em>) – whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>networkx graph of synteny</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientResponse" title="omadb.OMARestAPI.ClientResponse">ClientResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny.neighborhood">
+<span class="sig-name descname"><span class="pre">neighborhood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linearized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_circular_contigs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny.neighborhood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny.neighborhood" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve neighborhood around a HOG or protein at a particular level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>str</em>) – unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)</p></li>
+<li><p><strong>level</strong> (<em>str</em><em> or </em><em>int</em>) – taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.</p></li>
+<li><p><strong>evidence</strong> (<em>str</em>) – evidence value for the ancestral synteny graph, used for filtering. (‘linearized’, ‘parsimonious’, ‘any’). (default ‘linearized’)</p></li>
+<li><p><strong>context</strong> (<em>int</em>) – size of the graph around the query HOG, in terms of number of edges. (default 2)</p></li>
+<li><p><strong>break_circular_contigs</strong> (<em>bool</em>) – whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>networkx graph of synteny</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientResponse" title="omadb.OMARestAPI.ClientResponse">ClientResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny.neighbourhood">
+<span class="sig-name descname"><span class="pre">neighbourhood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evidence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linearized'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">break_circular_contigs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny.neighbourhood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny.neighbourhood" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve neighbourhood around a HOG or protein at a particular level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>str</em>) – unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)</p></li>
+<li><p><strong>level</strong> (<em>str</em><em> or </em><em>int</em>) – taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.</p></li>
+<li><p><strong>evidence</strong> (<em>str</em>) – evidence value for the ancestral synteny graph, used for filtering. (‘linearized’, ‘parsimonious’, ‘any’). (default ‘linearized’)</p></li>
+<li><p><strong>context</strong> (<em>int</em>) – size of the graph around the query HOG, in terms of number of edges. (default 2)</p></li>
+<li><p><strong>break_circular_contigs</strong> (<em>bool</em>) – whether to break ancestral contigs on the weakest edge, when ancestral contigs end up being circular. This has no effect if evidence is not set to linearized. (default True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>networkx graph of synteny</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientResponse" title="omadb.OMARestAPI.ClientResponse">ClientResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny.window">
+<span class="sig-name descname"><span class="pre">window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny.window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny.window" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve window around a HOG or protein at a particular level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>str</em>) – unique identifier for either a HOG (for ancestral synteny), or a protein (for extant synteny)</p></li>
+<li><p><strong>level</strong> (<em>str</em><em> or </em><em>int</em>) – taxonomic level of interest. Ancestral levels accept scientific name or numeric TaxID. Extant genomes also accept UniProt 5-letter species codes.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – size of the window +-n around the query HOG. (default 2)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of HOGs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.ClientResponse" title="omadb.OMARestAPI.ClientResponse">ClientResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="goenrichmentanalysis">
 <h2>GOEnrichmentAnalysis<a class="headerlink" href="#goenrichmentanalysis" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">GOEnrichmentAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">go</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">GOEnrichmentAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">go</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis" title="Permalink to this definition"></a></dt>
 <dd><p>Wrapper to GOATOOLs to make it more user-friendly with the API.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis.run_study">
@@ -1103,29 +1232,29 @@ the chromosome corresponds to the IDs in, for example:</p>
 
 </dd></dl>
 
-</section>
-<section id="clientresponse">
+</div>
+<div class="section" id="clientresponse">
 <h2>ClientResponse<a class="headerlink" href="#clientresponse" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientResponse">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_is_paginated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientResponse" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_is_paginated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientResponse" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#omadb.OMARestAPI.AttrDict" title="omadb.OMARestAPI.AttrDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">omadb.OMARestAPI.AttrDict</span></code></a></p>
 </dd></dl>
 
-</section>
-<section id="attrdict">
+</div>
+<div class="section" id="attrdict">
 <h2>AttrDict<a class="headerlink" href="#attrdict" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.AttrDict">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">AttrDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#AttrDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.AttrDict" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">AttrDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#AttrDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.AttrDict" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="clientpagedresponse">
+</div>
+<div class="section" id="clientpagedresponse">
 <h2>ClientPagedResponse<a class="headerlink" href="#clientpagedresponse" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientPagedResponse">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientPagedResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientPagedResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse" title="Permalink to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientPagedResponse.__iter__">
 <span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse.__iter__" title="Permalink to this definition"></a></dt>
@@ -1158,14 +1287,14 @@ yielded in chunks.</p>
 
 </dd></dl>
 
-</section>
-<section id="license">
+</div>
+<div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline"></a></h2>
 <p>PyOMADB is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
 <p>PyOMADB is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.</p>
 <p>You should have received a copy of the GNU Lesser General Public License along with PyOMADB. If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

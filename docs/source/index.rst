@@ -50,6 +50,10 @@ Client
 
   Synonym of `xrefs`.
 
+  .. attribute:: synteny
+
+  Instance of :py:class:`omadb.OMARestAPI.Synteny`.
+
   .. automethod:: omadb.Client.clear_cache
 
 Genomes
@@ -109,6 +113,11 @@ ExternalReferences
   :members:
 
   .. automethod:: __call__
+
+Synteny
+++++++++
+.. autoclass:: omadb.OMARestAPI.Synteny
+  :members:
 
 GOEnrichmentAnalysis
 ++++++++++++++++++
