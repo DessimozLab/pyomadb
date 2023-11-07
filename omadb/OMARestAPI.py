@@ -1678,22 +1678,25 @@ class Synteny(ClientFunctionSet):
 
         if len(z.nodes) > 1:
             # all nodes should be connected when we have more than 1 node in the list
+            df = pd.DataFrame(dict(x) for x in z.links)
+            edge_attr = list(set(df.columns) - {'source', 'target'})
             G = nx.from_pandas_edgelist(
-                    pd.DataFrame(dict(x) for x in z.links),
+                    df,
                     source='source',
                     target='target',
-                    edge_attr=['weight', 'evidence']
+                    edge_attr=edge_attr,
                     )
         else:
             # add a single node graph
             G = nx.Graph()
             G.add_node(z.nodes[0].id)
 
+        # add other attribute information to the graph
         attributes = set(z.nodes[0].keys()) - {'id'}
         for k in attributes:
             nx.set_node_attributes(G, values={x['id']: x[k] for x in z.nodes}, name=k)
 
-        # add ability to lazy call for information about the hog
+        # add ability to lazy call for information about the node (hog / protein)
         nx.set_node_attributes(
                 G,
                 values={x['id']:
@@ -1701,7 +1704,9 @@ class Synteny(ClientFunctionSet):
                         self._client,
                         (
                             self._client.endpoint +
-                            self._client._get_request_uri(action='hog', subject=x['id'])[0])
+                            (self._client._get_request_uri(action='hog', subject=x['id'])[0] if
+                             x['id'].lower().startswith('hog:') else
+                             self._client._get_request_uri(action='protein', subject=x['id'])[0]))
                         )
                     for x in z.nodes
                     },
@@ -1787,6 +1792,9 @@ class Synteny(ClientFunctionSet):
         :rtype: ClientResponse
         '''
         G = self.neighbourhood(id, level, context=n)
+        # check that the ID we searched for is in the graph
+        # else we need to update to the "correct" ID. e.g. WHEAT100 -> WHEAT00100
+        G.adj.get(id, None)
 
         hog_order = deque([id])
 
