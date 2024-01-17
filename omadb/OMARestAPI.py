@@ -342,7 +342,8 @@ class Client(object):
 
     @lazy_property
     def version(self):
-        return self._request(action='version')
+        return self._request(request_type='nosession_get',
+                             action='version')
 
     @lazy_property
     def oma_release(self):
@@ -448,6 +449,9 @@ class Client(object):
             elif request_type == 'post':
                 data = self._get_request_data(**kwargs)
                 r = self._request_post(url, data)
+            elif request_type == 'nosession_get':
+                # for use to get the version number
+                r = requests.get(url, **params)
             else:
                 raise ValueError('Unsure how to deal with request type'
                                  '{}'.format(request_type))
