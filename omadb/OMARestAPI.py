@@ -23,6 +23,7 @@ from functools import lru_cache
 from io import StringIO
 from pprint import pformat
 from property_manager import lazy_property
+from requests import Session
 from requests_cache import CachedSession
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 from urllib.request import quote as uri_quote
@@ -302,7 +303,7 @@ class Client(object):
             else:
                 self.CACHE_PATH = os.path.abspath(persistent_cache_path)
             self._version_check()
-            self._setup_cache()
+        self._setup_session()
         self._setup()
 
         self._temp_path = TemporaryDirectory()
@@ -312,19 +313,21 @@ class Client(object):
         Clear both RAM and persistent cache.
         '''
         self._request_get.cache_clear()
-        if hasattr(self, 'session'):
+        if self.persistent_cached:
             self.session.close()
             del self.session
             shutil.rmtree(self.CACHE_PATH)
-            if self.persistent_cached:
-                self._version_check()
-                self._setup_cache()
+            self._version_check()
+        self._setup_cache()
 
-    def _setup_cache(self):
-        os.makedirs(self.CACHE_PATH, exist_ok=True)
-        self.session = CachedSession(cache_name=os.path.join(self.CACHE_PATH,
-                                                             'api-cache'),
-                                     backend='sqlite')
+    def _setup_session(self):
+        if self.persistent_cached:
+            os.makedirs(self.CACHE_PATH, exist_ok=True)
+            self.session = CachedSession(cache_name=os.path.join(self.CACHE_PATH,
+                                                                 'api-cache'),
+                                         backend='sqlite')
+        else:
+            self.session = Session()
 
     def _setup(self):
         self.genomes = Genomes(self)
@@ -409,19 +412,22 @@ class Client(object):
 
     @lru_cache(RAMCACHE_SIZE)
     def _request_get(self, url, **params):
-        get = getattr(self, 'session', requests).get
         LOG.debug(f'Calling GET {url}')
-        return get(url,
-                   headers=self.HEADERS,
-                   params=params,
-                   timeout=self.TIMEOUT)
+        return self.session.get(
+                url,
+                headers=self.HEADERS,
+                params=params,
+                timeout=self.TIMEOUT
+                )
 
     def _request_post(self, url, data):
         LOG.debug(f'Calling POST {url}')
-        return requests.post(url,
-                             data=data,
-                             headers=self.HEADERS,
-                             timeout=self.TIMEOUT)
+        return self.session.post(
+                url,
+                data=data,
+                headers=self.HEADERS,
+                timeout=self.TIMEOUT
+                )
 
     def _request(self, request_type='get', url=None, **kwargs):
         raw = kwargs.pop('raw', False)
@@ -863,7 +869,7 @@ class HOGs(ClientFunctionSet):
         root_level = z.level
 
         try:
-            r = requests.get('https://omabrowser.org/oma/hogs/{}/orthoxml'.format(m),
+            r = self._client.session.get('https://omabrowser.org/oma/hogs/{}/orthoxml'.format(m),
                              timeout=self._client.TIMEOUT)
         except requests.exceptions.Timeout:
             raise ClientTimeout('OrthoXML request timed out after'
@@ -1037,7 +1043,7 @@ class Entries(ClientFunctionSet):
         from goatools.obo_parser import GODag
         url = 'http://purl.obolibrary.org/obo/go/go-basic.obo'
         try:
-            r = requests.get(url, timeout=self._client.TIMEOUT)
+            r = self._client.session.get(url, timeout=self._client.TIMEOUT)
         except requests.exceptions.Timeout:
             raise ClientTimeout('Gene Ontology download request '
                                 'timed out after '
