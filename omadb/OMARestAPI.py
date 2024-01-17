@@ -318,7 +318,7 @@ class Client(object):
             del self.session
             shutil.rmtree(self.CACHE_PATH)
             self._version_check()
-        self._setup_cache()
+        self._setup_session()
 
     def _setup_session(self):
         if self.persistent_cached:
