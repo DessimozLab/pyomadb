@@ -907,72 +907,72 @@ class HOGs(ClientFunctionSet):
             fp.write(iham.HTML)
         print('{}'.format(fn))
 
-    #def gene_ontology(self, hog_id, level=None, aspect=None, as_dataframe=None,
-    #                  progress=False, **kwargs):
-    #    '''
-    #    Retrieve any associations to Gene Ontology terms for a protein.
+    def gene_ontology(self, hog_id, level=None, aspect=None, as_dataframe=None,
+                      progress=False, **kwargs):
+        '''
+        Retrieve any ancestral associations to Gene Ontology terms for a given HOG identifier, at a particular taxonomic level.
 
-    #    :param hog_id: a unique identifier for a hog_group - either its hog id starting with "HOG:" or one of its member proteins in which case the specific HOG ID of that protein is used. (Example: HOG:0001221.1a, P12345)
-    #    :type hog_id: str or list
-    #    :param level: taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)
-    #    :type level: str or list
-    #    :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
-    #    :param bool as_dataframe: whether to return as pandas data frame, optional
-    #    :param bool progress: whether to show a progress bar during load (default False)
+        :param hog_id: a unique identifier for a Hierarchical Orthologous Group - its HOGID starting with "HOG:". (Example: HOG:0001221.1a)
+        :type hog_id: str or list
+        :param level: taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)
+        :type level: str or list
+        :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
+        :param bool as_dataframe: whether to return as pandas data frame, optional
+        :param bool progress: whether to show a progress bar during load (default False)
 
-    #    :return: gene ontology associations
-    #    :rtype: list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy
-    #    '''
-    #    if not isinstance(hog_id, list):
-    #        # get individual
-    #        z = self._client._request(action=['hog', 'gene_ontology'],
-    #                                  subject=hog_id,
-    #                                  params={'level': level},
-    #                                  as_dataframe=as_dataframe)
-    #        if aspect is None or len(z) == 0:
-    #            return z
+        :return: gene ontology associations
+        :rtype: list or pd.DataFrame
+        '''
+        if not isinstance(hog_id, list):
+            # get individual
+            z = self._client._request(action=['hog', 'gene_ontology'],
+                                      subject=hog_id,
+                                      params={'level': level},
+                                      as_dataframe=as_dataframe)
+            if aspect is None or len(z) == 0:
+                return z
 
-    #        # Translate
-    #        aspects = {'bp': 'biological_process',
-    #                   'cc': 'cellular_component',
-    #                   'mf': 'molecular_function'}
-    #        valid_aspects = set(aspects.values())
-    #        aspect = aspects.get(aspect.lower(), aspect)
+            # Translate
+            aspects = {'bp': 'biological_process',
+                       'cc': 'cellular_component',
+                       'mf': 'molecular_function'}
+            valid_aspects = set(aspects.values())
+            aspect = aspects.get(aspect.lower(), aspect)
 
-    #        assert (aspect in valid_aspects), 'Unknown aspect: {}'.format(aspect)
-    #        if as_dataframe:
-    #            return z[z.aspect == aspect]
-    #        else:
-    #            return list(filter(lambda x: x.aspect == aspect, z))
-    #    else:
-    #        # get multiple
-    #        if not isinstance(level, list):
-    #            level = itertools.repeat(level, len(hog_id))
-    #        else:
-    #            assert (len(hog_id) == len(level)), 'HOG IDs and level must be same length if given as list'
-    #
-    #        # now load multiple
-    #        if as_dataframe:
-    #            dfs = []
-    #            for x in tqdm(zip(hog_id, level), desc='Retrieving GO',
-    #                          disable=(not progress)):
-    #                df = self.gene_ontology(hog_id=x[0],
-    #                                        level=x[1],
-    #                                        aspect=aspect,
-    #                                        as_dataframe=True)
-    #                df['hog_id'] = x[0]
-    #                df['level'] = x[1]
-    #                df = df.set_index(['hog_id', 'level'])
-    #                dfs.append(df)
+            assert (aspect in valid_aspects), 'Unknown aspect: {}'.format(aspect)
+            if as_dataframe:
+                return z[z.aspect == aspect]
+            else:
+                return list(filter(lambda x: x.aspect == aspect, z))
+        else:
+            # get multiple
+            if not isinstance(level, list):
+                level = itertools.repeat(level, len(hog_id))
+            else:
+                assert (len(hog_id) == len(level)), 'HOG IDs and level must be same length if given as list'
+    
+            # now load multiple
+            if as_dataframe:
+                dfs = []
+                for x in tqdm(zip(hog_id, level), desc='Retrieving GO',
+                              disable=(not progress)):
+                    df = self.gene_ontology(hog_id=x[0],
+                                            level=x[1],
+                                            aspect=aspect,
+                                            as_dataframe=True)
+                    df['hog_id'] = x[0]
+                    df['level'] = x[1]
+                    df = df.set_index(['hog_id', 'level'])
+                    dfs.append(df)
 
-    #            return pd.concat(dfs)
-    #        else:
-    #            return {x: self.gene_ontology(hog_id=x[0],
-    #                                          level=x[1],
-    #                                          aspect=aspect)
-    #                    for x in tqdm(zip(hog_id, level),
-    #                                  desc='Retrieving GO',
-    #                                  disable=(not progress))}
+                return pd.concat(dfs)
+            else:
+                return {x: self.gene_ontology(hog_id=x[0],
+                                             level=x[1],
+                                              aspect=aspect)
+                        for x in tqdm(zip(hog_id, level),
+                                      desc='Retrieving GO',
+                                      disable=(not progress))}
 
 
 class Entries(ClientFunctionSet):
