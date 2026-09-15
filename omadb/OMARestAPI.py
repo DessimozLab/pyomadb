@@ -331,6 +331,7 @@ class Client(object):
 
     def _setup(self):
         self.genomes = Genomes(self)
+        self.ancestral_genomes = AncestralGenomes(self)
         self.entries = self.proteins = Entries(self)
         self.hogs = HOGs(self)
         self.groups = OMAGroups(self)
@@ -663,6 +664,205 @@ class Genomes(ClientFunctionSet):
                                      paginated=True,
                                      progress_desc=desc)
 
+    def get_genome_goea(self, genome_id):
+        '''
+        Load all GO annotations and get a GOEnrichmentAnalysis object to perform custom GO enrichment analyses.
+
+        :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code
+        :type genome_id: str or int
+        '''
+        proteins = self.proteins(genome_id, progress=True)
+        prot_ids = list(map(lambda x: x., proteins))
+        return self._client.proteins.gene_ontology(prot_ids, as_goea=True, progress=True)
+
+
+class AncestralGenomes(ClientFunctionSet):
+    '''
+    API functionality for ancestral genome information.
+
+    Access indirectly, via the client.
+
+    Example::
+
+        from omadb import Client
+        c = Client()
+        plants = c.ancestral_genomes.genome('Viridiplantae')
+    '''
+    def __getitem__(self, genome_id):
+        '''
+        Retrieve information on an ancestral genome in OMA.
+
+        :param genome_id: unique identifier for taxonomic level of ancestral genome
+        :type genome_id: str
+
+        :return: genome information
+        :rtype: ClientResponse
+        '''
+        return self.genome(genome_id)
+
+    def __iter__(self):
+        '''Iterate over all genomes.'''
+        yield from self.genomes.items()
+
+    @property
+    def list(self):
+        '''
+        Synonym for `genomes`. Retrieve information on all genomes in OMA.
+
+        :return: information on all genomes
+        :rtype: ClientResponse
+        '''
+        return self.genomes
+
+    @lazy_property
+    def genomes(self):
+        '''
+        Retrieve information on all genomes in OMA.
+
+        :return: information on all genomes
+        :rtype: ClientResponse
+        '''
+        t = self._client.taxonomy.dendropy_tree().clone()
+        t.suppress_unifurcations()
+        levels = list(map(lambda n: n.taxon.label, t.internal_nodes()))
+        r = {level: {'name': level,
+                     'genes': ClientRequest(self._client,
+                                            self._client.endpoint + '/hog/?level={}'.format(uri_quote(level)))}
+             for level in levels}
+        return ClientResponse(r, client=self._client)
+
+    def genome(self, genome_id):
+        '''
+        Retrieve information on an ancestral genome in OMA.
+
+        :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code
+        :type genome_id: str or int
+
+        :return: genome information
+        :rtype: ClientResponse
+        '''
+        return self._client._request(action='hog', params={'level': genome_id})
+
+    def genes(self, genome_id, progress=False):
+        '''
+        Retrive all ancestral genes for a particular ancestral genome.
+
+        :param genome_id: unique identifier for taxonomic level of ancestral genome
+        :type genome_id: str
+        :param bool progress: whether to show progress bar
+
+        :return: ancestral proteins in genome
+        :rtype: ClientPagedResponse
+        '''
+        desc = 'Retrieving ancestral genes for {}'.format(genome_id) if progress else ''
+        return self._client._request(action='hog',
+                                     params={'level': genome_id},
+                                     paginated=True,
+                                     progress_desc=desc)
+
+    def events_between(self, from_node, to_node, event_type='all', progress=False):
+        '''
+        Identify the events between two levels in the taxonomy, with ancestral genes classified
+        into "gained", "duplicated", "lost" and "retained" groups
+
+        :param from_node: name of node in taxonomy (more ancestral)
+        :type from_node: str
+        :param to_node: name of node in taxonomy (more extant)
+        :type to_node: str
+        :param event_type: name of event type, choice of 'gained', 'duplicated', 'lost', 'retained' or 'all' (default)
+        :type event_type: str
+
+        :return: dictionary of genes
+        :rtype: dict
+        '''
+        assert event_type.lower() in {'gained', 'duplicated', 'lost', 'retained', 'all'}, 'Please check event type is valid.'
+        genes_by_event = defaultdict(list)
+        desc = 'Retrieving ancestral genes at {} classified by events between {} and {}'.format(to_node, from_node, to_node)
+        for x in tqdm(self._client.hogs.at_level(to_node, compare=from_node), desc=desc, disable=(not progress)):
+            genes_by_event[x.event.lower()].append(x)
+        if event_type.lower() == 'all':
+            return genes_by_event
+        else:
+            return genes_by_event[event_type.lower()]
+
+    def ancestral_go_enrichment_by_event(self, from_node, to_node, event_type='all', hog_completeness=0.3, progress=False):
+        '''
+        Perform GO enrichment analysis by event type between two levels in the taxonomy, with ancestral genes classified
+        into "gained", "duplicated", "lost" and "retained" groups.
+
+        :param from_node: name of node in taxonomy (more ancestral)
+        :type from_node: str
+        :param to_node: name of node in taxonomy (more extant)
+        :type to_node: str
+        :param event_type: name of event type, choice of 'gained', 'duplicated', 'lost', 'retained' or 'all' (default)
+        :type event_type: str
+        :param hog_completeness: HOGs >= hog_completeness score to include in the analysis
+        :type hog_completeness: float
+
+        :return: dataframe of enrichment results
+        :rtype: pd.DataFrame
+        '''
+        hog_completeness = 0 if hog_completeness is None else hog_completeness
+        assert event_type.lower() in {'gained', 'duplicated', 'lost', 'retained', 'all'}, 'Please check event type is valid.'
+        genes_by_event = self.events_between(from_node, to_node, event_type='all', progress=progress)
+        if event_type.lower() != 'lost':
+            # load GO terms for more extant ancestral genome
+            head_genes = (genes_by_event['gained'] + genes_by_event['duplicated'] + genes_by_event['retained'])
+            head_hog_ids = list(map(lambda x: x.hog_id,
+                                    filter(lambda x: x.completeness_score > hog_completeness,
+                                           head_genes)))
+            levels = {g.level for g in itertools.chain.from_iterable(genes_by_event.values())}
+            assert len(levels) == 2, 'Please raise github issue, this should not happen.'
+
+            head_goea = self._client.hogs.gene_ontology(head_hog_ids, level=to_node, as_goea=True, progress=True, ignore_error=True)
+        else:
+            head_goea = None
+
+        if event_type.lower() == 'lost' or event_type.lower() == 'all':
+            # load GO terms for more ancestral ancestral genome
+            tail_genes = self.genes(from_node)
+            tail_hog_ids = list(map(lambda x: x.hog_id,
+                                    filter(lambda x: x.completeness_score > hog_completeness,
+                                           tail_genes)))
+
+            levels = {g.level for g in tail_genes}
+            assert len(levels) == 2, 'Please raise github issue, this should not happen.'
+
+            tail_goea = self._client.hogs.gene_ontology(tail_hog_ids, level=to_node, as_goea=True, progress=True, ignore_error=True)
+        else:
+            tail_goea = None
+
+        # event types to perform enrichment on
+        to_do = [event_type.lower()] if event_type.lower() != 'all' else ['gained', 'duplicated', 'lost', 'retained']
+
+        res_dfs = []
+        for ev_type in to_do:
+            fg = list(map(lambda x: x.hog_id, genes_by_event[ev_type]))
+            # performing duplication at head_node
+            goea = head_goea if ev_type != 'lost' else tail_goea
+            df = goea.run_study(fg)
+            df['event_type'] = ev_type
+            res_dfs.append(df)
+
+        return pd.concat(res_dfs)
+
+    def get_genome_goea(self, genome_id, hog_completeness=0.3):
+        '''
+        Load all GO annotations and get a GOEnrichmentAnalysis object to perform custom GO enrichment analyses..
+        :param genome_id: unique identifier for taxonomic level of ancestral genome
+        :type genome_id: str
+        '''
+        hog_completeness = 0 if hog_completeness is None else hog_completeness
+        genes = self.genes(genome_id)
+        hog_ids = list(map(lambda x: x.hog_id, 
+                           filter(lambda x: x.completeness_score > hog_completeness,
+                                  genes)))
+
+        levels = {g.level for g in genes}
+        assert len(levels) == 1, 'Please raise github issue, this should not happen.'
+
+        return self._client.hogs.gene_ontology(hog_ids, level=genome_id, as_goea=True, progress=True, ignore_error=True)
+        
 
 class HOGs(ClientFunctionSet):
     '''
@@ -907,7 +1107,7 @@ class HOGs(ClientFunctionSet):
             fp.write(iham.HTML)
         print('{}'.format(fn))
 
-    def gene_ontology(self, hog_id, level=None, aspect=None, as_dataframe=None,
+    def gene_ontology(self, hog_id, level=None, aspect=None, as_goea=None, as_dataframe=None,
                       progress=False, **kwargs):
         '''
         Retrieve any ancestral associations to Gene Ontology terms for a given HOG identifier, at a particular taxonomic level.
@@ -917,18 +1117,26 @@ class HOGs(ClientFunctionSet):
         :param level: taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)
         :type level: str or list
         :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
+        :param bool as_goea: whether to return a GOEnrichmentAnalysis object, optional
         :param bool as_dataframe: whether to return as pandas data frame, optional
         :param bool progress: whether to show a progress bar during load (default False)
 
         :return: gene ontology associations
         :rtype: list or pd.DataFrame
         '''
+        score_cutoff = 0.1  # from pyoma
         if not isinstance(hog_id, list):
             # get individual
-            z = self._client._request(action=['hog', 'gene_ontology'],
-                                      subject=hog_id,
-                                      params={'level': level},
-                                      as_dataframe=as_dataframe)
+            try:
+                z = self._client._request(action=['hog', 'gene_ontology'],
+                                          subject=hog_id,
+                                          params={'level': level},
+                                          as_dataframe=as_dataframe)
+            except ClientException:
+                if kwargs.get('ignore_error', False):
+                    return []
+                raise
+            z = list(filter(lambda x: x.score > score_cutoff, z))
             if aspect is None or len(z) == 0:
                 return z
 
@@ -955,11 +1163,12 @@ class HOGs(ClientFunctionSet):
             if as_dataframe:
                 dfs = []
                 for x in tqdm(zip(hog_id, level), desc='Retrieving GO',
-                              disable=(not progress)):
+                              disable=(not progress), total=len(hog_id)):
                     df = self.gene_ontology(hog_id=x[0],
                                             level=x[1],
                                             aspect=aspect,
-                                            as_dataframe=True)
+                                            as_dataframe=True,
+                                            **kwargs)
                     df['hog_id'] = x[0]
                     df['level'] = x[1]
                     df = df.set_index(['hog_id', 'level'])
@@ -967,12 +1176,21 @@ class HOGs(ClientFunctionSet):
 
                 return pd.concat(dfs)
             else:
-                return {x: self.gene_ontology(hog_id=x[0],
-                                             level=x[1],
-                                              aspect=aspect)
-                        for x in tqdm(zip(hog_id, level),
-                                      desc='Retrieving GO',
-                                      disable=(not progress))}
+                z = {x[0]: self.gene_ontology(hog_id=x[0],
+                                              level=x[1],
+                                              aspect=aspect,
+                                              **kwargs)
+                     for x in tqdm(zip(hog_id, level),
+                                   desc='Retrieving GO',
+                                   disable=(not progress),
+                                   total=len(hog_id))}
+
+                if as_goea:
+                    # new wrapper to goatools to give df as res
+                    methods = kwargs.get('methods', ['fdr_bh'])
+                    return GOEnrichmentAnalysis(z, self._client.proteins._gene_ontology, methods)
+                else:
+                    return z
 
 
 class Entries(ClientFunctionSet):
@@ -1066,7 +1284,6 @@ class Entries(ClientFunctionSet):
         :param str aspect: GO aspect - biological process (BP), cellular component (CC), molecular function (MF)
         :param bool as_dataframe: whether to return as pandas data frame, optional
         :param bool as_goea: whether to return a GOEnrichmentAnalysis object, optional
-        :param bool as_goatools: whether to return as GOATOOLS GOEA object, optional (deprecated)
         :param bool progress: whether to show a progress bar during load (default False)
 
         :return: gene ontology associations
@@ -1078,7 +1295,8 @@ class Entries(ClientFunctionSet):
             if as_dataframe:
                 dfs = []
                 for x in tqdm(entry_id, desc='Retrieving GO',
-                              disable=(not progress)):
+                              disable=(not progress),
+                              total=len(entry_id)):
                     df = self.gene_ontology(x, aspect=aspect, as_dataframe=True)
                     df['query_id'] = x
                     df = df.set_index('query_id')
@@ -1089,32 +1307,17 @@ class Entries(ClientFunctionSet):
                 z = {x: self.gene_ontology(x, aspect=aspect)
                      for x in tqdm(entry_id,
                                    desc='Retrieving GO',
-                                   disable=(not progress))}
+                                   disable=(not progress),
+                                   total=len(entry_id))}
 
                 if as_goea:
                     # new wrapper to goatools to give df as res
                     methods = kwargs.get('methods', ['fdr_bh'])
                     return GOEnrichmentAnalysis(z, self._gene_ontology, methods)
-
-                elif as_goatools:
-                    # for backwards compatibility keep this
-                    from goatools.go_enrichment import GOEnrichmentStudy
-
-                    methods = kwargs.get('methods', ['fdr_bh'])
-                    goea = GOEnrichmentStudy(z.keys(),
-                                             {k: {x.GO_term for x in v}
-                                              for (k, v) in z.items()},
-                                             self._gene_ontology,
-                                             methods=methods)
-                    return goea
-
                 else:
                     return z
 
         else:
-            if as_goatools:
-                raise ValueError('Not possible to load GOEA object for single '
-                                 'entry.')
             z = self._client._request(action=['protein', 'gene_ontology'],
                                       subject=entry_id,
                                       as_dataframe=as_dataframe)
@@ -1647,13 +1850,14 @@ class GOEnrichmentAnalysis(object):
     def __init__(self, annots, go, methods):
         from goatools.go_enrichment import GOEnrichmentStudy
 
+        self.population = set(annots.keys())
         self._goea = GOEnrichmentStudy(annots.keys(),
                                        {k: {x.GO_term for x in v}
                                         for (k, v) in annots.items()},
                                        go,
                                        methods=methods)
 
-    def run_study(self, foreground):
+    def run_study(self, study_set):
         '''
         Runs the GOEA study and returns a dataframe of results.
 
@@ -1663,7 +1867,7 @@ class GOEnrichmentAnalysis(object):
         :return: enrichment analysis results
         :rtype: pd.DataFrame
         '''
-        res = self._goea.run_study(foreground)
+        res = self._goea.run_study(study_set)
         return pd.DataFrame.from_records((dict(zip(z.get_prtflds_default(),
                                                    z.get_field_values(z.get_prtflds_default())))
                                           for z in res))
