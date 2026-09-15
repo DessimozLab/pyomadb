@@ -672,7 +672,7 @@ class Genomes(ClientFunctionSet):
         :type genome_id: str or int
         '''
         proteins = self.proteins(genome_id, progress=True)
-        prot_ids = list(map(lambda x: x., proteins))
+        prot_ids = list(map(lambda x: x.omaid, proteins))
         return self._client.proteins.gene_ontology(prot_ids, as_goea=True, progress=True)
 
 
@@ -707,7 +707,7 @@ class AncestralGenomes(ClientFunctionSet):
     @property
     def list(self):
         '''
-        Synonym for `genomes`. Retrieve information on all genomes in OMA.
+        Synonym for `genomes`. Retrieve information on all ancestral genomes in OMA.
 
         :return: information on all genomes
         :rtype: ClientResponse

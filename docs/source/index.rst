@@ -14,6 +14,10 @@ Client
 
   Instance of :py:class:`omadb.OMARestAPI.Genomes`.
 
+  .. attribute:: ancestral_genomes
+
+  Instance of :py:class:`omadb.OMARestAPI.AncestralGenomes`.
+
   .. attribute:: entries
 
   Instance of :py:class:`omadb.OMARestAPI.Entries`.
@@ -59,6 +63,15 @@ Client
 Genomes
 +++++++
 .. autoclass:: omadb.OMARestAPI.Genomes
+  :members:
+
+  .. automethod:: __getitem__
+
+  .. automethod:: __iter__
+
+AncestralGenomes
++++++++
+.. autoclass:: omadb.OMARestAPI.AncestralGenomes
   :members:
 
   .. automethod:: __getitem__
