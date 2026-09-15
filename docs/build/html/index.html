@@ -8,14 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PyOMADB &mdash; PyOMADB 2.2.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=ea147abf"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -223,7 +223,7 @@
 <h2>Client<a class="headerlink" href="#client" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.Client">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'omabrowser.org/api'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cached</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.Client" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.</span></span><span class="sig-name descname"><span class="pre">Client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'omabrowser.org/api'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cached</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistent_cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.Client" title="Link to this definition"></a></dt>
 <dd><p>Client for the OMA browser REST API.</p>
 <p>Initialisation example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
@@ -331,13 +331,13 @@
 <h2>Genomes<a class="headerlink" href="#genomes" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Genomes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Genomes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes" title="Link to this definition"></a></dt>
 <dd><p>API functionality for genome information.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">wheat</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="s1">&#39;WHEAT&#39;</span><span class="p">)</span>
+<span class="n">wheat</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="s1">'WHEAT'</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -397,7 +397,7 @@ frame.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes.genomes">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">genomes</span></span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.genomes" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">genomes</span></span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Genomes.genomes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Genomes.genomes" title="Link to this definition"></a></dt>
 <dd><p>Retrieve information on all genomes in OMA.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -415,7 +415,7 @@ frame.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Genomes.list">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list</span></span><a class="headerlink" href="#omadb.OMARestAPI.Genomes.list" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">list</span></span><a class="headerlink" href="#omadb.OMARestAPI.Genomes.list" title="Link to this definition"></a></dt>
 <dd><p>Synonym for <cite>genomes</cite>. Retrieve information on all genomes in OMA.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -454,13 +454,13 @@ frame.</p>
 <h2>Entries<a class="headerlink" href="#entries" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Entries">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Entries" title="Link to this definition"></a></dt>
 <dd><p>API functionality for protein entries.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">entry</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="s1">&#39;WHEAT00001&#39;</span><span class="p">]</span>
+<span class="n">entry</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">entries</span><span class="p">[</span><span class="s1">'WHEAT00001'</span><span class="p">]</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -524,11 +524,10 @@ frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>list</em>) – a unique identifier for a protein</p></li>
+<li><p><strong>entry_id</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – a unique identifier for a protein</p></li>
 <li><p><strong>aspect</strong> (<em>str</em>) – GO aspect - biological process (BP), cellular component (CC), molecular function (MF)</p></li>
 <li><p><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</p></li>
 <li><p><strong>as_goea</strong> (<em>bool</em>) – whether to return a GOEnrichmentAnalysis object, optional</p></li>
-<li><p><strong>as_goatools</strong> (<em>bool</em>) – whether to return as GOATOOLS GOEA object, optional (deprecated)</p></li>
 <li><p><strong>progress</strong> (<em>bool</em>) – whether to show a progress bar during load (default False)</p></li>
 </ul>
 </dd>
@@ -536,7 +535,7 @@ frame.</p>
 <dd class="field-even"><p>gene ontology associations</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</p>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list">list</a> or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</p>
 </dd>
 </dl>
 </dd></dl>
@@ -714,13 +713,13 @@ frame.</p>
 <h2>HOGs<a class="headerlink" href="#hogs" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.HOGs">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">HOGs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">HOGs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs" title="Link to this definition"></a></dt>
 <dd><p>API functionality for HOG information.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">entry</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">hogs</span><span class="p">[</span><span class="s1">&#39;WHEAT00001&#39;</span><span class="p">]</span>
+<span class="n">entry</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">hogs</span><span class="p">[</span><span class="s1">'WHEAT00001'</span><span class="p">]</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -825,14 +824,15 @@ parent (default None)
 
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.HOGs.gene_ontology">
-<span class="sig-name descname"><span class="pre">gene_ontology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hog_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.gene_ontology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.gene_ontology" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">gene_ontology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hog_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aspect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_goea</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_dataframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#HOGs.gene_ontology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.HOGs.gene_ontology" title="Link to this definition"></a></dt>
 <dd><p>Retrieve any ancestral associations to Gene Ontology terms for a given HOG identifier, at a particular taxonomic level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hog_id</strong> (<em>str</em><em> or </em><em>list</em>) – a unique identifier for a Hierarchical Orthologous Group - its HOGID starting with “HOG:”. (Example: HOG:0001221.1a)</p></li>
-<li><p><strong>level</strong> (<em>str</em><em> or </em><em>list</em>) – taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)</p></li>
+<li><p><strong>hog_id</strong> (<em>str</em><em> or </em><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – a unique identifier for a Hierarchical Orthologous Group - its HOGID starting with “HOG:”. (Example: HOG:0001221.1a)</p></li>
+<li><p><strong>level</strong> (<em>str</em><em> or </em><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – taxonomic level of reference for a HOG - default is its deepest level for a given HOG ID. (Example: Mammalia)</p></li>
 <li><p><strong>aspect</strong> (<em>str</em>) – GO aspect - biological process (BP), cellular component (CC), molecular function (MF)</p></li>
+<li><p><strong>as_goea</strong> (<em>bool</em>) – whether to return a GOEnrichmentAnalysis object, optional</p></li>
 <li><p><strong>as_dataframe</strong> (<em>bool</em>) – whether to return as pandas data frame, optional</p></li>
 <li><p><strong>progress</strong> (<em>bool</em>) – whether to show a progress bar during load (default False)</p></li>
 </ul>
@@ -841,7 +841,7 @@ parent (default None)
 <dd class="field-even"><p>gene ontology associations</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list or pd.DataFrame or goatools.go_enrichment.GOEnrichmentStudy</p>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list">list</a> or pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -923,7 +923,7 @@ also contains orthologGroup nodes that have only one children node.</p>
 <dd class="field-even"><p>list of members</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list or pd.DataFrame</p>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list">list</a> or pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -956,13 +956,13 @@ also contains orthologGroup nodes that have only one children node.</p>
 <h2>OMAGroups<a class="headerlink" href="#omagroups" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.OMAGroups">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">OMAGroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#OMAGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.OMAGroups" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">OMAGroups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#OMAGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.OMAGroups" title="Link to this definition"></a></dt>
 <dd><p>API functionality for retrieving information on OMA groups.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">og</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;WHEAT00001&#39;</span><span class="p">]</span>
+<span class="n">og</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="s1">'WHEAT00001'</span><span class="p">]</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1009,7 +1009,7 @@ group.</p>
 <dd class="field-even"><p>sorted list of closely related groups</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list or pd.DataFrame</p>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list">list</a> or pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1038,13 +1038,13 @@ group.</p>
 <h2>Function<a class="headerlink" href="#function" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Function">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Function" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Function" title="Link to this definition"></a></dt>
 <dd><p>API functionality for retrieving functional annotations for sequences.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">gos</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="s1">&#39;ATCATATCAT&#39;</span><span class="p">)</span>
+<span class="n">gos</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="s1">'ATCATATCAT'</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1063,7 +1063,7 @@ OMA database.</p>
 <dd class="field-even"><p>results of fast function prediction</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list or pd.DataFrame</p>
+<dd class="field-odd"><p><a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list">list</a> or pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1075,7 +1075,7 @@ OMA database.</p>
 <h2>Taxonomy<a class="headerlink" href="#taxonomy" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Taxonomy">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Taxonomy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Taxonomy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Taxonomy.dendropy_tree">
 <span class="sig-name descname"><span class="pre">dendropy_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">members</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Taxonomy.dendropy_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Taxonomy.dendropy_tree" title="Link to this definition"></a></dt>
@@ -1083,7 +1083,7 @@ OMA database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>members</strong> (<em>list</em>) – list of members to get the induced taxonomy for, optional</p></li>
+<li><p><strong>members</strong> (<a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – list of members to get the induced taxonomy for, optional</p></li>
 <li><p><strong>root</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>None</em>) – taxon ID, species name or UniProt species code for root taxonomic level, optional</p></li>
 <li><p><strong>with_names</strong> (<em>bool</em>) – whether to use species code (False, default) or species names (True), optional</p></li>
 </ul>
@@ -1104,7 +1104,7 @@ OMA database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>members</strong> (<em>list</em>) – list of members to get the induced taxonomy for, optional</p></li>
+<li><p><strong>members</strong> (<a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – list of members to get the induced taxonomy for, optional</p></li>
 <li><p><strong>root</strong> (<em>str</em><em> or </em><em>int</em><em> or </em><em>None</em>) – taxon ID, species name or UniProt species code for root taxonomic level, optional</p></li>
 <li><p><strong>with_names</strong> (<em>bool</em>) – whether to use species code (False, default) or species names (True), optional</p></li>
 </ul>
@@ -1125,7 +1125,7 @@ OMA database.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>members</strong> (<em>list</em>) – list of members to get the induced taxonomy for, optional</p></li>
+<li><p><strong>members</strong> (<a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – list of members to get the induced taxonomy for, optional</p></li>
 <li><p><strong>format</strong> (<em>str</em>) – format of the taxonomy (dictionary [default], newick or phyloxml)</p></li>
 <li><p><strong>collapse</strong> (<em>bool</em>) – whether or not to collapse levels with single child, optional (default yes)</p></li>
 </ul>
@@ -1167,13 +1167,13 @@ OMA database.</p>
 <h2>PairwiseRelations<a class="headerlink" href="#pairwiserelations" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.PairwiseRelations">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">PairwiseRelations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#PairwiseRelations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.PairwiseRelations" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">PairwiseRelations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#PairwiseRelations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.PairwiseRelations" title="Link to this definition"></a></dt>
 <dd><p>API functionality for pairwise relations..</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">arath_wheat_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="s1">&#39;ARATH&#39;</span><span class="p">,</span> <span class="s1">&#39;WHEAT&#39;</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">arath_wheat_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="s1">'ARATH'</span><span class="p">,</span> <span class="s1">'WHEAT'</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1187,9 +1187,9 @@ relations to a certain chromosome for one or both genomes. The ID of
 the chromosome corresponds to the IDs in, for example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="s1">&#39;HUMAN&#39;</span><span class="p">)</span>
-<span class="n">human_inparalogues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="s1">&#39;HUMAN&#39;</span><span class="p">,</span>
-                                     <span class="s1">&#39;HUMAN&#39;</span><span class="p">,</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">genomes</span><span class="o">.</span><span class="n">genome</span><span class="p">(</span><span class="s1">'HUMAN'</span><span class="p">)</span>
+<span class="n">human_inparalogues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="s1">'HUMAN'</span><span class="p">,</span>
+                                     <span class="s1">'HUMAN'</span><span class="p">,</span>
                                      <span class="n">chr1</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">chromosomes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                      <span class="n">chr2</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">chromosomes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                                      <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
@@ -1223,13 +1223,13 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>ExternalReferences<a class="headerlink" href="#externalreferences" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ExternalReferences">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ExternalReferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ExternalReferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ExternalReferences" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ExternalReferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ExternalReferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ExternalReferences" title="Link to this definition"></a></dt>
 <dd><p>API functionality for external references from a query sequence.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">xrefs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="s1">&#39;AAA&#39;</span><span class="p">)</span>
+<span class="n">xrefs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="s1">'AAA'</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1259,13 +1259,13 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>Synteny<a class="headerlink" href="#synteny" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.Synteny">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Synteny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">Synteny</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#Synteny"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.Synteny" title="Link to this definition"></a></dt>
 <dd><p>API functionality for loading synteny data.</p>
 <p>Access indirectly, via the client.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">omadb</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
-<span class="n">xrefs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">synteny</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="s1">&#39;AAA&#39;</span><span class="p">)</span>
+<span class="n">xrefs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">synteny</span><span class="o">.</span><span class="n">xrefs</span><span class="p">(</span><span class="s1">'AAA'</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -1363,15 +1363,15 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>GOEnrichmentAnalysis<a class="headerlink" href="#goenrichmentanalysis" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">GOEnrichmentAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">go</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">GOEnrichmentAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">go</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis" title="Link to this definition"></a></dt>
 <dd><p>Wrapper to GOATOOLs to make it more user-friendly with the API.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.GOEnrichmentAnalysis.run_study">
-<span class="sig-name descname"><span class="pre">run_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">foreground</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis.run_study"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis.run_study" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">study_set</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#GOEnrichmentAnalysis.run_study"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.GOEnrichmentAnalysis.run_study" title="Link to this definition"></a></dt>
 <dd><p>Runs the GOEA study and returns a dataframe of results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>foreground</strong> (<em>list</em>) – unique identifiers for proteins in foreground set</p>
+<dd class="field-odd"><p><strong>foreground</strong> (<a class="reference internal" href="#omadb.OMARestAPI.Genomes.list" title="omadb.OMARestAPI.Genomes.list"><em>list</em></a>) – unique identifiers for proteins in foreground set</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>enrichment analysis results</p>
@@ -1389,7 +1389,7 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>ClientResponse<a class="headerlink" href="#clientresponse" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientResponse">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_is_paginated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientResponse" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_is_paginated</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientResponse" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#omadb.OMARestAPI.AttrDict" title="omadb.OMARestAPI.AttrDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttrDict</span></code></a></p>
 </dd></dl>
 
@@ -1398,7 +1398,7 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>AttrDict<a class="headerlink" href="#attrdict" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.AttrDict">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">AttrDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#AttrDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.AttrDict" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">AttrDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#AttrDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.AttrDict" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -1406,7 +1406,7 @@ the chromosome corresponds to the IDs in, for example:</p>
 <h2>ClientPagedResponse<a class="headerlink" href="#clientpagedresponse" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientPagedResponse">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientPagedResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">omadb.OMARestAPI.</span></span><span class="sig-name descname"><span class="pre">ClientPagedResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_desc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="omadb.OMARestAPI.ClientPagedResponse.__iter__">
 <span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/omadb/OMARestAPI.html#ClientPagedResponse.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#omadb.OMARestAPI.ClientPagedResponse.__iter__" title="Link to this definition"></a></dt>
