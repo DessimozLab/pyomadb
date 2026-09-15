@@ -670,6 +670,9 @@ class Genomes(ClientFunctionSet):
 
         :param genome_id: unique identifier for genome, NCBI taxonomic ID or UniProt species code
         :type genome_id: str or int
+
+        :return: GO Enrichment object
+        :rtype: GOEnrichmentAnalysis
         '''
         proteins = self.proteins(genome_id, progress=True)
         prot_ids = list(map(lambda x: x.omaid, proteins))
@@ -848,9 +851,13 @@ class AncestralGenomes(ClientFunctionSet):
 
     def get_genome_goea(self, genome_id, hog_completeness=0.3):
         '''
-        Load all GO annotations and get a GOEnrichmentAnalysis object to perform custom GO enrichment analyses..
+        Load all GO annotations and get a GOEnrichmentAnalysis object to perform custom GO enrichment analyses.
+
         :param genome_id: unique identifier for taxonomic level of ancestral genome
         :type genome_id: str
+
+        :return: GO Enrichment object
+        :rtype: GOEnrichmentAnalysis
         '''
         hog_completeness = 0 if hog_completeness is None else hog_completeness
         genes = self.genes(genome_id)
