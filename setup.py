@@ -27,7 +27,7 @@ with open('{:s}/__init__.py'.format(name), 'rt') as fp:
             exec(line.rstrip())
 
 requirements = ['property_manager', 'requests_cache>=0.8.1', 'tqdm',
-                'appdirs', 'requests', 'pandas', 'networkx']
+                'appdirs', 'requests', 'pandas', 'networkx', 'dendropy', 'goatools']
 
 desc = 'Client to the OMA browser, using the REST API.'
 
@@ -41,9 +41,7 @@ setup(
     long_description=desc + '\n Documentation available `here <https://dessimozlab.github.io/pyomadb/build/html/>`_.',
     packages=find_packages(),
     install_requires=requirements,
-    extras_require={'dendropy': ['dendropy'],
-                    'ete3': ['ete3'],
-                    'goea': ['goatools'],
+    extras_require={'ete3': ['ete3'],
                     'hog_analysis': ['pyham']},
     python_requires=">=3.6",
     license='LGPLv3')
